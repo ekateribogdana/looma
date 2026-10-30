@@ -1,0 +1,935 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0F0F0F">
+<title>Кейс Looma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500&display=swap">
+<style>
+:root{
+  color-scheme: dark;
+  --bg:#0F0F0F; --bg2:#151515; --bg3:#1D1C1C; --card:#282727;
+  --line:rgba(255,255,255,.10); --line2:rgba(255,255,255,.22);
+  --text:#F4F0EC; --muted:rgba(244,240,236,.62); --faint:rgba(244,240,236,.42);
+  --red:#FE5D57; --deep:#9E0500; --dred:#6B0F0C; --mred:#983834;
+  --serif:'Cormorant Garamond', 'Cormorant', Garamond, 'Times New Roman', serif;
+  --sans:'Inter', -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --ease:cubic-bezier(.2,.75,.15,1);
+}
+html,body{height:100%;margin:0;overflow:hidden;background:#0A0A0A;color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+h1,h2,h3,p{margin:0;font-weight:400}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--red);outline-offset:4px;border-radius:6px}
+
+/* ---------- stage ---------- */
+#viewport{position:fixed;inset:0;overflow:hidden;touch-action:pan-y}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:0 0;background:var(--bg);overflow:hidden;border-radius:4px}
+.glow{position:absolute;left:0;top:0;width:900px;height:900px;margin:-450px 0 0 -450px;border-radius:50%;
+  background:radial-gradient(circle, rgba(254,93,87,.10) 0%, rgba(254,93,87,.04) 35%, transparent 65%);
+  pointer-events:none;z-index:40;mix-blend-mode:screen;opacity:0;transition:opacity .6s}
+#stage:hover .glow{opacity:1}
+
+.slide{position:absolute;inset:0;padding:96px 120px 140px;opacity:0;visibility:hidden;
+  transition:opacity .8s var(--ease), visibility 0s linear .8s, transform .9s var(--ease), filter .8s;
+  transform:scale(1.015);filter:blur(6px)}
+.slide.active{opacity:1;visibility:visible;transform:none;filter:none;transition:opacity .8s var(--ease), transform 1.1s var(--ease), filter .8s}
+.slide.active .r{animation:rise 1s var(--ease) both;animation-delay:calc(var(--d,0) * 90ms + 180ms)}
+.slide.active .r.done,.slide.active .ri.done{animation:none}
+@keyframes rise{from{opacity:0;transform:translateY(36px);filter:blur(10px)}}
+.slide.active .ri{animation:fadeIn 1.4s var(--ease) both;animation-delay:calc(var(--d,0) * 90ms + 100ms)}
+@keyframes fadeIn{from{opacity:0;transform:scale(1.06)}}
+
+/* ---------- type ---------- */
+.eyebrow{display:flex;gap:24px;align-items:baseline;font-size:22px;color:var(--faint);letter-spacing:.02em}
+.eyebrow b{font-weight:400;color:var(--red)}
+.hd{font-family:var(--serif);font-weight:500;font-size:112px;line-height:.98;letter-spacing:-.01em;text-wrap:balance}
+.hd i{font-style:italic;color:var(--red);font-weight:400}
+.h2{font-family:var(--serif);font-weight:500;font-size:76px;line-height:1.02;text-wrap:balance}
+.h3{font-family:var(--serif);font-weight:500;font-size:44px;line-height:1.08}
+.lead{font-size:30px;line-height:1.45;color:var(--muted);max-width:760px;font-weight:300}
+.body{font-size:24px;line-height:1.5;color:var(--muted);font-weight:300}
+.lbl{font-size:20px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.rule{height:1px;background:var(--line);width:100%}
+.top{display:grid;grid-template-columns:560px 1fr;gap:40px;align-items:start}
+.top .col{display:flex;flex-direction:column;gap:22px;padding-top:6px}
+
+/* ---------- controls ---------- */
+.chrome{position:absolute;left:0;right:0;bottom:0;height:120px;z-index:50;pointer-events:none}
+.progress{position:absolute;left:120px;right:420px;bottom:46px;height:40px;pointer-events:auto}
+.progress svg{width:100%;height:40px;overflow:visible;display:block}
+.progress .base{stroke:rgba(255,255,255,.12);stroke-width:1.5;fill:none}
+.progress .fill{stroke:var(--red);stroke-width:2;fill:none;filter:drop-shadow(0 0 6px rgba(254,93,87,.8));transition:stroke-dashoffset 1s var(--ease)}
+.progress .knot{fill:#fff;filter:drop-shadow(0 0 8px var(--red)) drop-shadow(0 0 3px var(--red));transition:cx 1s var(--ease), cy 1s var(--ease)}
+.progress .mark{fill:var(--bg);stroke:rgba(255,255,255,.35);stroke-width:1.5;cursor:pointer;transition:stroke .3s, r .3s}
+.progress .mark:hover{stroke:var(--red);r:9}
+.progress .mark.on{stroke:var(--red);fill:var(--red)}
+.progress .mtx{font-size:17px;fill:var(--faint);letter-spacing:.06em;pointer-events:none}
+.nav{position:absolute;right:120px;bottom:40px;display:flex;align-items:center;gap:18px;pointer-events:auto}
+.count{font-size:20px;color:var(--faint);font-variant-numeric:tabular-nums;letter-spacing:.08em;min-width:96px;text-align:right}
+.count b{color:var(--text);font-weight:400}
+.arrow{width:64px;height:64px;border-radius:50%;border:1px solid var(--line2);display:grid;place-items:center;transition:border-color .3s, background .3s, transform .3s}
+.arrow:hover{border-color:var(--red);background:rgba(254,93,87,.10);transform:scale(1.06)}
+.arrow svg{width:22px;height:22px;stroke:var(--text);fill:none;stroke-width:1.6}
+.arrow[disabled]{opacity:.3;pointer-events:none}
+.hint{position:absolute;left:50%;bottom:118px;transform:translateX(-50%);font-size:18px;color:var(--faint);letter-spacing:.1em;transition:opacity .6s;pointer-events:none}
+
+/* ---------- S1 cover ---------- */
+#s1{padding:0}
+#s1 .photo{position:absolute;right:-60px;top:-40px;width:1300px;height:1160px;object-fit:cover;opacity:.9;
+  mask-image:linear-gradient(90deg,transparent 0%,#000 30%);-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 30%);transition:transform 1.4s var(--ease)}
+#s1 .bar{position:absolute;left:120px;right:120px;top:72px;display:flex;justify-content:space-between;align-items:center;font-size:24px;z-index:3}
+.pill{padding:14px 34px;border-radius:40px;background:var(--text);color:var(--bg);font-size:22px}
+#s1 .logo{position:absolute;left:-20px;top:240px;width:1000px;mix-blend-mode:screen;z-index:2}
+#s1 .tag{position:absolute;left:124px;top:700px;z-index:3;display:flex;flex-direction:column;gap:28px}
+#s1 .tag p{font-family:var(--serif);font-size:48px;line-height:1.1;font-style:italic;color:var(--text)}
+.chips{display:flex;gap:14px}
+.chip{padding:14px 30px;border-radius:40px;border:1px solid rgba(254,93,87,.55);background:linear-gradient(90deg,rgba(107,15,12,.55),rgba(30,10,10,.6));font-size:22px;color:var(--muted);transition:all .35s var(--ease)}
+.chip:hover{color:var(--text);border-color:var(--red);box-shadow:0 0 30px rgba(254,93,87,.35);transform:translateY(-3px)}
+.thread{position:absolute;inset:0;z-index:1;pointer-events:none}
+.thread path{fill:none;stroke:var(--red);stroke-width:2.2;stroke-linecap:round;filter:drop-shadow(0 0 8px rgba(254,93,87,.9));stroke-dasharray:1;stroke-dashoffset:1}
+.slide.active .thread path{animation:draw 3.2s var(--ease) forwards .3s}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+/* ---------- S2 contents ---------- */
+#s2{display:grid;grid-template-columns:1fr 1fr;gap:80px}
+#s2 .num{font-size:180px;font-weight:300;letter-spacing:-.03em;line-height:1}
+#s2 .big{font-family:var(--serif);font-size:128px;font-weight:500;line-height:1;margin-bottom:64px}
+.toc{display:flex;flex-direction:column}
+.toc button{display:grid;grid-template-columns:120px 1fr 40px;align-items:center;text-align:left;padding:34px 0;border-bottom:1px solid var(--line);position:relative;font-size:34px}
+.toc button::after{content:"";position:absolute;left:0;bottom:-1px;height:2px;width:0;background:var(--red);box-shadow:0 0 12px var(--red);transition:width .6s var(--ease)}
+.toc button:hover::after{width:100%}
+.toc .k{color:var(--faint);font-size:24px;transition:color .3s}
+.toc .t{transition:transform .5s var(--ease), color .3s}
+.toc svg{width:28px;height:28px;stroke:var(--red);fill:none;stroke-width:1.6;opacity:0;transform:translateX(-12px);transition:all .4s var(--ease)}
+.toc button:hover .t{transform:translateX(16px);color:#fff}
+.toc button:hover .k{color:var(--red)}
+.toc button:hover svg{opacity:1;transform:none}
+
+/* ---------- S3 about ---------- */
+#s3{display:flex;flex-direction:column;gap:64px}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:56px;border-top:1px solid var(--line);padding-top:36px}
+.cols .c{display:flex;flex-direction:column;gap:18px}
+.cols .c p{font-size:30px;line-height:1.4;color:var(--text);font-weight:300}
+.quote{font-family:var(--serif);font-size:124px;line-height:1;font-weight:400;letter-spacing:-.01em;margin-top:auto}
+.quote span{display:block}
+.quote em{font-style:italic;color:var(--red)}
+.strike{position:relative;display:inline-block}
+.strike::after{content:"";position:absolute;left:-8px;right:-8px;top:56%;height:3px;background:var(--red);box-shadow:0 0 14px var(--red);transform:scaleX(0);transform-origin:left;transition:transform 1s var(--ease) 1.2s}
+.slide.active .strike::after{transform:scaleX(1)}
+
+/* ---------- S4 circles ---------- */
+#s4{padding:0}
+#s4 .bgimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.9;mix-blend-mode:screen}
+#s4 .head{position:absolute;left:120px;top:96px;display:flex;flex-direction:column;gap:20px;z-index:3;width:520px}
+.circ{position:absolute;border-radius:50%;background:radial-gradient(circle at 50% 35%,#1a1919,#101010 70%);border:1.5px solid rgba(254,93,87,.75);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;z-index:2;
+  transition:transform .8s var(--ease), box-shadow .6s, border-color .4s, opacity .5s, filter .5s;cursor:default}
+.circ h3{font-family:var(--serif);font-size:84px;font-weight:400;line-height:1}
+.circ p{font-size:24px;color:var(--faint);line-height:1.35;transition:color .4s}
+.circ:hover{transform:scale(1.05);border-color:var(--red);box-shadow:0 0 0 12px rgba(254,93,87,.06),0 0 80px rgba(254,93,87,.35), inset 0 0 60px rgba(254,93,87,.12)}
+.circ:hover p{color:var(--text)}
+.circles:has(.circ:hover) .circ:not(:hover){opacity:.45;filter:blur(1px)}
+.links{position:absolute;inset:0;z-index:1;pointer-events:none}
+.links line{stroke:var(--red);stroke-width:2;opacity:0;filter:drop-shadow(0 0 6px var(--red));transition:opacity .5s;stroke-dasharray:6 10;animation:flow 1.2s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-32}}
+
+/* ---------- S5 metaphor ---------- */
+#s5{display:grid;grid-template-columns:760px 1fr;gap:80px}
+#s5 .left{display:flex;flex-direction:column;gap:36px}
+.steps{display:flex;flex-direction:column;margin-top:24px;position:relative}
+.step{display:grid;grid-template-columns:88px 1fr;gap:28px;padding:26px 0;border-top:1px solid var(--line);cursor:default;transition:background .4s}
+.step .o{width:72px;height:72px;border-radius:50%;border:1.5px solid rgba(254,93,87,.6);display:grid;place-items:center;font-family:var(--serif);font-size:30px;color:var(--red);transition:all .5s var(--ease)}
+.step h3{font-family:var(--serif);font-size:44px;font-weight:500;line-height:1.1;margin-bottom:8px}
+.step p{font-size:24px;line-height:1.45;color:var(--muted);font-weight:300}
+.step:hover .o{background:var(--red);color:var(--bg);box-shadow:0 0 40px rgba(254,93,87,.6);transform:scale(1.08)}
+.steps:has(.step:hover) .step:not(:hover){opacity:.4}
+.step{transition:opacity .4s}
+.panel{position:relative;border-radius:40px;overflow:hidden;background:#111;height:844px}
+.panel .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.panel .phone{position:absolute;left:50%;top:60px;width:300px;transform:translateX(-50%);border-radius:44px;box-shadow:0 40px 120px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.08);transition:transform .8s var(--ease), box-shadow .6s}
+.panel:hover .phone{transform:translateX(-50%) translateY(-14px) scale(1.02);box-shadow:0 60px 140px rgba(0,0,0,.8),0 0 80px rgba(254,93,87,.25)}
+.orbit{position:absolute;border-radius:50%;border:1px solid rgba(254,93,87,.35);left:50%;top:50%;pointer-events:none}
+.orbit.a{width:620px;height:620px;margin:-310px;animation:spin 40s linear infinite}
+.orbit.b{width:780px;height:780px;margin:-390px;border-style:dashed;border-color:rgba(254,93,87,.18);animation:spin 70s linear infinite reverse}
+.orbit::before{content:"";position:absolute;top:-5px;left:50%;width:10px;height:10px;border-radius:50%;background:var(--red);box-shadow:0 0 16px var(--red)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- S6 gallery ---------- */
+#s6{display:flex;flex-direction:column;gap:48px}
+.acc{display:flex;gap:20px;height:620px}
+.acc figure{margin:0;flex:1;position:relative;border-radius:32px;overflow:hidden;transition:flex 1s var(--ease);background:#111}
+.acc figure img{width:100%;height:100%;object-fit:cover;transition:transform 1.4s var(--ease), filter .8s}
+.acc figure figcaption{position:absolute;left:32px;bottom:28px;right:32px;font-family:var(--serif);font-size:40px;font-style:italic;opacity:0;transform:translateY(16px);transition:all .6s var(--ease) .1s}
+.acc figure::after{content:"";position:absolute;inset:0;border-radius:32px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);pointer-events:none;transition:box-shadow .6s}
+.acc:hover figure{filter:saturate(.6) brightness(.6)}
+.acc figure:hover{flex:2.2;filter:none}
+.acc figure:hover img{transform:scale(1.06)}
+.acc figure:hover figcaption{opacity:1;transform:none}
+.acc figure:hover::after{box-shadow:inset 0 0 0 1.5px rgba(254,93,87,.6)}
+.acc figure{transition:flex 1s var(--ease), filter .6s}
+
+/* ---------- S7 logo ---------- */
+#s7{display:flex;flex-direction:column;gap:48px}
+.duo{display:grid;grid-template-columns:1.55fr 1fr;gap:24px;height:600px}
+.tile{border-radius:36px;background:var(--bg2);border:1px solid var(--line);position:relative;overflow:hidden;display:grid;place-items:center}
+.tile .lg{width:92%;mix-blend-mode:screen;transition:transform 1.2s var(--ease)}
+.tile:hover .lg{transform:scale(1.04)}
+.tile .sheen{position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(254,93,87,.10) 50%,transparent 60%);transform:translateX(-100%);pointer-events:none}
+.tile:hover .sheen{transform:translateX(100%);transition:transform 1.6s var(--ease)}
+.tile .ic{width:220px;border-radius:48px;transition:transform 1s var(--ease), box-shadow .6s;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.tile:hover .ic{transform:rotate(-8deg) scale(1.1);box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 90px rgba(254,93,87,.45)}
+.tile .cap{position:absolute;left:36px;bottom:30px;font-size:20px;color:var(--faint);letter-spacing:.14em;text-transform:uppercase}
+
+/* ---------- S8 UI kit colours ---------- */
+#s8{display:grid;grid-template-columns:1fr 640px;gap:88px}
+.pal{display:grid;grid-template-columns:1fr 1fr;gap:44px 40px;align-content:start}
+.pal>:first-child{grid-column:1/-1}
+.grp{display:flex;flex-direction:column;gap:14px}
+.sw{display:flex;gap:14px}
+.s{width:104px;display:flex;flex-direction:column;gap:10px;text-align:left}
+.s i{display:block;height:96px;border-radius:16px;border:1px solid rgba(255,255,255,.10);transition:transform .5s var(--ease), box-shadow .5s, height .5s var(--ease)}
+.s span{font-size:20px;color:var(--text);white-space:nowrap}
+.s small{font-size:18px;color:var(--faint);font-variant-numeric:tabular-nums;transition:color .3s}
+.s:hover i{transform:translateY(-8px);box-shadow:0 18px 40px rgba(0,0,0,.6)}
+.s:hover small{color:var(--red)}
+.comps{display:flex;flex-direction:column;gap:32px}
+.btnrow{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.b-pri{padding:22px 44px;border-radius:18px;border:1.5px solid rgba(254,93,87,.7);background:linear-gradient(180deg,#6B0F0C,#3a0907);font-size:24px;transition:all .4s var(--ease)}
+.b-pri:hover{box-shadow:0 0 40px rgba(254,93,87,.45);border-color:var(--red);transform:translateY(-3px)}
+.b-sec{padding:22px 44px;border-radius:18px;border:1.5px solid var(--line2);font-size:24px;color:var(--muted);transition:all .4s var(--ease)}
+.b-sec:hover{border-color:var(--text);color:var(--text);transform:translateY(-3px)}
+.inp{padding:20px 26px;border-radius:14px;border:1px solid #3C3C3C;background:#151515;font-size:22px;color:var(--faint);width:300px;font-family:var(--sans)}
+.inp:focus{outline:none;border-color:var(--red);color:var(--text)}
+.cardimg{width:100%;border-radius:22px;transition:transform .6s var(--ease), box-shadow .6s}
+.cardimg:hover{transform:translateY(-8px) rotate(-.6deg);box-shadow:0 30px 70px rgba(0,0,0,.6),0 0 60px rgba(254,93,87,.2)}
+.toast{position:absolute;left:50%;top:48px;transform:translate(-50%,-20px);padding:14px 28px;border-radius:40px;background:var(--text);color:var(--bg);font-size:20px;opacity:0;transition:all .4s var(--ease);z-index:60;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- S9 type ---------- */
+#s9{display:flex;flex-direction:column;gap:48px}
+.faces{display:grid;grid-template-columns:1fr 1fr;gap:24px;flex:1}
+.face{border-radius:36px;background:var(--bg2);border:1px solid var(--line);padding:48px 56px;display:flex;flex-direction:column;gap:14px;overflow:hidden;position:relative}
+.face .aa{font-size:160px;line-height:.9;transition:color .6s, transform 1s var(--ease);transform-origin:left bottom}
+.face:hover .aa{color:var(--red);transform:scale(1.04)}
+.face .nm{font-size:22px;color:var(--faint);letter-spacing:.06em;margin-bottom:10px}
+.tr{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-top:1px solid var(--line);transition:padding .4s var(--ease)}
+.tr small{font-size:18px;color:var(--faint);font-family:var(--sans);font-variant-numeric:tabular-nums;transition:color .3s;white-space:nowrap}
+.tr:hover{padding-left:12px}
+.tr:hover small{color:var(--red)}
+
+/* ---------- S10 hero ---------- */
+#s10{padding:0;background:#050505}
+#s10 .mock{position:absolute;inset:-40px;width:calc(100% + 80px);height:calc(100% + 80px);object-fit:cover;transition:transform 1.2s var(--ease)}
+#s10 .ov{position:absolute;left:120px;top:96px;z-index:2;display:flex;flex-direction:column;gap:20px}
+#s10 .ov .hd{font-size:140px}
+#s10 .shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,5,5,.85) 0%,rgba(5,5,5,.2) 45%,transparent 70%);z-index:1}
+
+/* ---------- phones ---------- */
+.phones{display:flex;gap:28px;align-items:flex-end;justify-content:center}
+.ph{display:flex;flex-direction:column;gap:18px;align-items:center;transition:transform .7s var(--ease), opacity .5s, filter .5s}
+.ph img{display:block;border-radius:36px;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.06);transition:box-shadow .6s}
+.ph .n{font-size:20px;color:var(--faint);letter-spacing:.06em;transition:color .3s}
+.ph:hover{transform:translateY(-22px)}
+.ph:hover img{box-shadow:0 50px 100px rgba(0,0,0,.7),0 0 0 1.5px rgba(254,93,87,.5),0 0 90px rgba(254,93,87,.28)}
+.ph:hover .n{color:var(--red)}
+.phones:has(.ph:hover) .ph:not(:hover){opacity:.45;filter:saturate(.5)}
+
+#s11{display:flex;flex-direction:column;gap:56px}
+#s11 .ph img{width:252px}
+#s12{display:grid;grid-template-columns:600px 1fr 460px;gap:40px;align-items:center}
+#s12 .left{display:flex;flex-direction:column;gap:28px;align-self:start;position:relative;z-index:2}
+#s12 .blocks{position:relative;z-index:2}
+.rings{position:relative;height:880px;display:grid;place-items:center}
+.ring{position:absolute;border-radius:50%;left:50%;top:50%;pointer-events:none}
+.ring.r1{width:1000px;height:1000px;margin:-500px;background:#1a1a1a}
+.ring.r2{width:780px;height:780px;margin:-390px;background:#151515}
+.ring.r3{width:540px;height:540px;margin:-270px;background:#101010;box-shadow:0 0 0 1px rgba(254,93,87,.12)}
+.ring.pulse{width:540px;height:540px;margin:-270px;border:1.5px solid rgba(254,93,87,.5);animation:pulse 3.6s var(--ease) infinite}
+@keyframes pulse{0%{transform:scale(1);opacity:.8}100%{transform:scale(1.85);opacity:0}}
+.rings .ph img{width:330px}
+.blocks{display:flex;flex-direction:column;gap:0}
+.blocks div{padding:24px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:48px 1fr;gap:16px;font-size:26px;transition:color .3s, padding .4s var(--ease)}
+.blocks div span{color:var(--red);font-family:var(--serif);font-size:28px}
+.blocks div:hover{padding-left:12px;color:#fff}
+
+#s13{display:grid;grid-template-columns:560px 1fr;gap:56px}
+#s13 .left{display:flex;flex-direction:column;gap:28px}
+#s13 .ph img{width:320px}
+#s13 .ph:nth-child(2){transform:translateY(-40px)}
+#s13 .ph:nth-child(2):hover{transform:translateY(-62px)}
+#s13 .ph:nth-child(3){transform:translateY(-80px)}
+#s13 .ph:nth-child(3):hover{transform:translateY(-102px)}
+
+#s14{display:flex;flex-direction:column;gap:40px}
+#s14 .flow{display:grid;grid-template-columns:280px 1fr 280px 1fr 280px;align-items:center;justify-items:center;padding:0 60px}
+#s14 .ph img{width:250px}
+.conn{width:100%;height:80px;overflow:visible}
+.conn path{fill:none;stroke:var(--red);stroke-width:2;filter:drop-shadow(0 0 6px var(--red));stroke-dasharray:6 10;animation:flow 1.2s linear infinite}
+.conn circle{fill:#fff;filter:drop-shadow(0 0 8px var(--red))}
+
+/* ---------- S15 research ---------- */
+#s15{display:grid;grid-template-columns:560px 1fr;gap:56px}
+#s15 .left{display:flex;flex-direction:column;gap:28px}
+.ten{font-family:var(--serif);font-size:300px;line-height:.8;color:var(--red);font-weight:400;text-shadow:0 0 60px rgba(254,93,87,.35);margin-top:auto}
+.tbl{display:flex;flex-direction:column}
+.tbl .row{display:grid;grid-template-columns:72px 1fr 1fr;gap:28px;padding:26px 0;border-top:1px solid var(--line);align-items:start;transition:background .4s, padding .4s var(--ease)}
+.tbl .row.h{padding:0 0 14px;border-top:0}
+.tbl .row:not(.h):hover{padding-left:14px}
+.tbl .row:not(.h):hover .ck{background:var(--red);color:var(--bg);border-color:var(--red)}
+.tbl .ck{width:44px;height:44px;border-radius:50%;border:1.5px solid rgba(254,93,87,.6);display:grid;place-items:center;color:var(--red);transition:all .4s}
+.tbl .ck svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2}
+.tbl .sc{font-size:28px}
+.tbl .hy{font-size:24px;color:var(--muted);line-height:1.45;font-weight:300}
+.out{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:40px}
+.out div{border-radius:28px;background:var(--bg2);border:1px solid var(--line);padding:32px 36px;display:flex;flex-direction:column;gap:14px;transition:border-color .4s, transform .6s var(--ease)}
+.out div:hover{border-color:rgba(254,93,87,.5);transform:translateY(-6px)}
+.out p{font-family:var(--serif);font-size:38px;line-height:1.15}
+
+/* ---------- S16 end ---------- */
+#s16{padding:0;background:#141313}
+#s16 .th{position:absolute;left:-200px;top:40px;width:2300px;mix-blend-mode:screen;opacity:.95;transition:transform 1.4s var(--ease)}
+#s16 .big{position:absolute;left:112px;top:120px;font-size:150px;white-space:nowrap;line-height:1;letter-spacing:-.035em;font-weight:400;z-index:2}
+#s16 .big span{color:var(--red)}
+#s16 .meta{position:absolute;left:960px;right:120px;top:560px;display:grid;grid-template-columns:1fr 1fr;gap:44px 40px;z-index:2}
+#s16 .meta div{display:flex;flex-direction:column;gap:10px}
+#s16 .meta p{font-size:30px}
+
+
+/* ---------- live prototype ---------- */
+#proto{display:grid;grid-template-columns:560px 1fr 400px;gap:40px;align-items:center}
+#proto .left{display:flex;flex-direction:column;gap:28px;align-self:start}
+.try{display:flex;flex-direction:column;margin-top:8px}
+.try div{display:grid;grid-template-columns:48px 1fr;gap:14px;padding:20px 0;border-top:1px solid var(--line);font-size:25px;transition:padding .4s var(--ease), color .3s}
+.try div span{color:var(--red);font-family:var(--serif);font-size:28px}
+.try div:hover{padding-left:12px;color:#fff}
+.stagewrap{position:relative;display:grid;place-items:center;height:844px}
+.stagewrap::before{content:"";position:absolute;width:760px;height:760px;border-radius:50%;background:radial-gradient(circle,rgba(254,93,87,.16),transparent 62%);animation:breathe 5s ease-in-out infinite}
+@keyframes breathe{50%{transform:scale(1.08);opacity:.7}}
+.device{position:relative;width:380px;height:822px;border-radius:54px;background:#0f0f0f;
+  box-shadow:0 0 0 9px #1c1b1b,0 0 0 10px rgba(255,255,255,.14),0 50px 120px rgba(0,0,0,.85),0 0 90px rgba(254,93,87,.18);transition:box-shadow .6s, transform .8s var(--ease)}
+.device:hover{box-shadow:0 0 0 9px #1c1b1b,0 0 0 10.5px rgba(254,93,87,.6),0 50px 120px rgba(0,0,0,.85),0 0 140px rgba(254,93,87,.35);transform:translateY(-6px)}
+.device iframe{position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:54px;background:#0f0f0f}
+.device .ph-load{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--serif);font-size:40px;font-style:italic;color:var(--faint)}
+.side{display:flex;flex-direction:column;gap:22px;align-self:end;margin-bottom:40px}
+.qr{width:220px;height:220px;padding:16px;border-radius:24px;background:#F4F0EC;display:grid;place-items:center;transition:transform .6s var(--ease), box-shadow .6s}
+.qr:hover{transform:rotate(-2deg) scale(1.04);box-shadow:0 0 60px rgba(254,93,87,.35)}
+.qr img,.qr canvas{width:188px!important;height:188px!important;image-rendering:pixelated}
+.act{display:inline-flex;align-items:center;gap:12px;padding:18px 30px;border-radius:40px;border:1px solid var(--line2);font-size:22px;color:var(--text);text-decoration:none;width:max-content;transition:all .4s var(--ease)}
+.act:hover{border-color:var(--red);background:rgba(254,93,87,.10);transform:translateX(6px)}
+.act svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7}
+.chip.live{color:var(--text);position:relative;padding-left:52px}
+.chip.live::before{content:"";position:absolute;left:26px;top:50%;width:10px;height:10px;margin-top:-5px;border-radius:50%;background:var(--red);box-shadow:0 0 12px var(--red);animation:blink 1.6s ease-in-out infinite}
+@keyframes blink{50%{opacity:.25}}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .thread path{stroke-dashoffset:0}
+}
+
+/* ---------- product slides ---------- */
+.slide,.ten,.o,.card .o,.dec .o{font-variant-numeric:lining-nums;font-feature-settings:"lnum" 1}
+.prod{display:flex;flex-direction:column;gap:44px}
+.prod .top .lead{max-width:900px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.cards.c4{grid-template-columns:repeat(4,1fr)}
+.cards.c2{grid-template-columns:1fr 1fr}
+.card{border-radius:32px;background:var(--bg2);border:1px solid var(--line);padding:36px 40px;display:flex;flex-direction:column;gap:14px;transition:border-color .4s,transform .6s var(--ease)}
+.card:hover{border-color:rgba(254,93,87,.5);transform:translateY(-6px)}
+.card .o{width:56px;height:56px;border-radius:50%;border:1.5px solid rgba(254,93,87,.6);display:grid;place-items:center;font-family:var(--serif);font-size:26px;color:var(--red)}
+.card h3{font-family:var(--serif);font-weight:500;font-size:38px;line-height:1.1}
+.card p{font-size:22px;line-height:1.5;color:var(--muted);font-weight:300}
+.card .m{margin-top:auto;padding-top:18px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.card .m p{color:var(--text);font-size:21px}
+.lbl.red{color:var(--red)}
+.ns{display:flex;align-items:center;gap:48px;border-radius:28px;background:linear-gradient(90deg,rgba(107,15,12,.45),rgba(20,10,10,.4));border:1px solid rgba(254,93,87,.45);padding:22px 40px}
+.ns h3{font-family:var(--serif);font-weight:500;font-size:38px;line-height:1.05;flex:0 0 620px}
+.ns p{font-size:22px;line-height:1.5;color:var(--muted);font-weight:300}
+.list{display:flex;flex-direction:column}
+.list div{display:flex;flex-direction:column;gap:6px;padding:18px 0;border-top:1px solid var(--line)}
+.list b{font-weight:400;font-size:26px}
+.list span{font-size:20px;color:var(--faint)}
+.quoteln{border-left:2px solid var(--red);padding:6px 0 6px 32px;font-family:var(--serif);font-size:38px;line-height:1.25;font-style:italic}
+.chain{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.chain .cs{display:flex;flex-direction:column;gap:4px;white-space:nowrap;flex:none}
+.chain .cs b{font-family:var(--serif);font-weight:500;font-size:40px}
+.chain .cs.op b{font-size:28px;color:var(--muted)}
+.chain .cs small{font-size:16px;letter-spacing:.08em;color:var(--faint)}
+.chain .cs.end b{color:var(--red)}
+.chain svg{width:34px;height:14px;stroke:var(--red);fill:none;stroke-width:1.6}
+.tldr .cols .c p{font-size:24px}
+.tldr .cols .c:first-child{border-top:2px solid var(--red);margin-top:-37px;padding-top:35px}
+.dec{display:flex;flex-direction:column}
+.dec .row{display:grid;grid-template-columns:96px 520px 1fr;gap:32px;align-items:start;padding:26px 0;border-top:1px solid var(--line)}
+.dec .o{width:64px;height:64px;border-radius:50%;border:1.5px solid rgba(254,93,87,.6);display:grid;place-items:center;font-family:var(--serif);font-size:28px;color:var(--red)}
+.dec h3{font-family:var(--serif);font-weight:500;font-size:40px;line-height:1.1}
+.dec p{font-size:22px;line-height:1.45;color:var(--muted);font-weight:300}
+.dec p em{font-style:normal;color:var(--red)}
+.tbl .res{font-size:24px;line-height:1.45;display:flex;gap:10px;align-items:baseline}
+.tbl .res small{display:block;color:var(--red);font-size:19px;margin-top:6px}
+.tbl.rs .row{grid-template-columns:72px 360px 1fr}
+.meta p a{color:inherit;text-decoration:none;border-bottom:1px solid rgba(254,93,87,.5)}
+.meta p a:hover{color:var(--red)}
+#hyp{gap:32px}#hyp .card{padding:26px 34px;gap:10px}#hyp .card h3{font-size:34px}#hyp .card p{font-size:20px}#hyp .card .m p{font-size:19px}
+</style>
+</head>
+<body>
+<div id="viewport">
+<div id="stage">
+  <div class="glow" id="glow"></div>
+
+  <!-- 1 cover -->
+  <section class="slide" id="s1" data-sec="Кейс">
+    <img class="photo ri" src="img/cover.webp" alt="Две руки, связанные красной нитью" data-par="18">
+    <svg class="thread" viewBox="0 0 1920 1080" aria-hidden="true"><path pathLength="1" d="M-40 900 C 200 880, 320 640, 560 700 S 900 980, 1080 760 S 1180 420, 1420 470"/></svg>
+    <div class="bar r" style="--d:0"><span>Продуктовый дизайн</span><span>Екатерина Богданова</span><span class="pill">2026</span></div>
+    <img class="logo r" style="--d:2" src="img/logo.webp" alt="Логотип LOOMA">
+    <div class="tag">
+      <p class="r" style="--d:4">Занятия, события и люди — в одном месте</p>
+      <div class="chips r" style="--d:5"><button class="chip" data-goid="s5">Метафора</button><button class="chip" data-goid="s10">Проектирование</button><button class="chip live" data-goid="proto">Прототип</button><button class="chip" data-goid="s15">Тестирование</button></div>
+    </div>
+  </section>
+
+  <!-- tl;dr -->
+  <section class="slide prod tldr" id="tldr" data-sec="Кейс">
+    <div class="r" style="--d:0"><div class="eyebrow"><b>Кейс за 30 секунд</b></div><h2 class="hd" style="font-size:96px;margin-top:20px">Одно приложение вместо чатов, афиш и&nbsp;соцсетей студий</h2></div>
+    <div class="cols" style="grid-template-columns:repeat(4,1fr);gap:40px">
+      <div class="c r" style="--d:1"><span class="lbl red">01 · Проблема</span><p>Занятия, события и люди разбросаны по чатам и соцсетям — сложно найти своё, а знакомства теряются</p></div>
+      <div class="c r" style="--d:2"><span class="lbl">02 · Моя роль</span><p>Продуктовый дизайнер на всём цикле: проблема и гипотезы, метафора и айдентика, UX/UI, тест. Соло, 2&nbsp;месяца</p></div>
+      <div class="c r" style="--d:3"><span class="lbl">03 · Решение</span><p>Персональная лента занятий, событий и людей и «Ваша нить» — история общих встреч</p></div>
+      <div class="c r" style="--d:4"><span class="lbl">04 · Результат</span><p>10 педагогов прошли ключевые сценарии кабинета. Узкое место — кнопка «Опубликовать» — исправлено</p></div>
+    </div>
+    <div class="r" style="--d:5;display:flex;gap:24px;align-items:baseline"><span class="lbl red">Главная метрика</span><span style="font-family:var(--serif);font-size:40px">записи на занятия и события в неделю</span></div>
+  </section>
+
+  <!-- 2 contents -->
+  <section class="slide" id="s2" data-sec="Кейс">
+    <div class="num r" style="--d:0">(01)</div>
+    <div>
+      <h2 class="big r" style="--d:1">Процесс работы</h2>
+      <div class="toc">
+        <button class="r" style="--d:2" data-goid="s3"><span class="k">(A)</span><span class="t">О проекте</span><svg viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6"/></svg></button>
+        <button class="r" style="--d:3" data-goid="s5"><span class="k">(B)</span><span class="t">Метафора</span><svg viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6"/></svg></button>
+        <button class="r" style="--d:4" data-goid="s10"><span class="k">(C)</span><span class="t">Проектирование</span><svg viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6"/></svg></button>
+        <button class="r" style="--d:5" data-goid="s15"><span class="k">(D)</span><span class="t">Тестирование</span><svg viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6"/></svg></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 about -->
+  <section class="slide" id="s3" data-sec="A">
+    <div class="top">
+      <div class="col r" style="--d:0"><div class="eyebrow"><b>(A)</b></div><h2 class="h2">О проекте</h2></div>
+    </div>
+    <div class="cols">
+      <div class="c r" style="--d:1"><span class="lbl">Приложение</span><p>Looma — пространство для танцоров</p></div>
+      <div class="c r" style="--d:2"><span class="lbl">Задача</span><p>Находить занятия и события, знакомиться с людьми и расти внутри сообщества</p></div>
+      <div class="c r" style="--d:3"><span class="lbl">Проблема</span><p>Занятия, события и люди находятся в разных пространствах. Looma собирает их в одном месте</p></div>
+    </div>
+    <div class="quote r" style="--d:5"><span>Информация есть,</span><span><em>связей</em> между ней — <span class="strike">нет</span></span></div>
+  </section>
+
+  <!-- 4 circles -->
+  <section class="slide" id="s4" data-sec="A">
+    <img class="bgimg ri" src="img/threads-bg.webp" alt="" data-par="10">
+    <div class="head r" style="--d:0"><div class="eyebrow"><b>(A)</b><span>Что объединяет Looma</span></div><h2 class="h2">Четыре точки одной нити</h2></div>
+    <div class="circles">
+      <svg class="links" viewBox="0 0 1920 1080" aria-hidden="true">
+        <line data-a="0" data-b="1" x1="560" y1="640" x2="1030" y2="360"/><line data-a="0" data-b="2" x1="560" y1="640" x2="1030" y2="770"/>
+        <line data-a="0" data-b="3" x1="560" y1="640" x2="1540" y2="600"/><line data-a="1" data-b="2" x1="1030" y1="360" x2="1030" y2="770"/>
+        <line data-a="1" data-b="3" x1="1030" y1="360" x2="1540" y2="600"/><line data-a="2" data-b="3" x1="1030" y1="770" x2="1540" y2="600"/>
+      </svg>
+      <div class="circ r" data-i="0" style="--d:1;left:300px;top:380px;width:520px;height:520px"><h3>Занятия</h3><p>мастер-классы,<br>тренировки</p></div>
+      <div class="circ r" data-i="1" style="--d:2;left:810px;top:140px;width:440px;height:440px"><h3>Люди</h3><p>знакомства, комьюнити,<br>коллаборации</p></div>
+      <div class="circ r" data-i="2" style="--d:3;left:830px;top:570px;width:400px;height:400px"><h3>События</h3><p>батлы, фестивали,<br>вечеринки</p></div>
+      <div class="circ r" data-i="3" style="--d:4;left:1350px;top:410px;width:380px;height:380px"><h3>Связи</h3><p>вдохновение,<br>развитие, карьера</p></div>
+    </div>
+  </section>
+
+  <!-- context -->
+  <section class="slide prod" id="ctx" data-sec="A">
+    <div class="top r" style="--d:0">
+      <div class="col"><div class="eyebrow"><b>(A)</b><span>Контекст</span></div><h2 class="h2">Откуда проект</h2></div>
+      <div class="col"><span class="lbl">Концепт-проект · 2 месяца · соло</span><p class="lead" style="max-width:980px">Проект вырос из моего опыта в танцах: занятия ищешь в чатах, о событиях узнаёшь из соцсетей студий, а знакомства с мастер-классов теряются. Я много раз обсуждала это с танцорами в раздевалках и на занятиях — и раз за разом слышала одно и то же</p></div>
+    </div>
+    <div class="cards c2">
+      <div class="card r" style="--d:2"><span class="lbl red">Роль 1 · Учиться танцевать</span><h3>Танцоры</h3><p>Хотят находить занятия и события под свой стиль и уровень, знакомиться и расти в сообществе</p><div class="m"><span class="lbl red">Боль</span><p>Информация разбросана, а о педагоге почти ничего не понятно до первого занятия</p></div></div>
+      <div class="card r" style="--d:3"><span class="lbl red">Роль 2 · Преподавать</span><h3>Педагоги</h3><p>Хотят набирать учеников, публиковать занятия и рассказывать о себе</p><div class="m"><span class="lbl red">Боль</span><p>Расписание и анонсы приходится вести сразу в нескольких местах</p></div></div>
+    </div>
+  </section>
+
+  <!-- hypotheses -->
+  <section class="slide prod" id="hyp" data-sec="A">
+    <div class="top r" style="--d:0">
+      <div class="col"><div class="eyebrow"><b>(A)</b><span>Гипотезы</span></div><h2 class="h2">Гипотезы и&nbsp;метрики</h2></div>
+      <div class="col"><span class="lbl">Что должно сработать</span><p class="lead">И как я бы поняла, что сработало</p></div>
+    </div>
+    <div class="ns r" style="--d:1"><div><span class="lbl red">Главная метрика · North Star</span><h3 style="margin-top:10px">Записи на занятия и&nbsp;события в&nbsp;неделю</h3></div><p>Главная ценность Looma — человек находит занятие и приходит на него. Связи и нить растут из этих встреч</p></div>
+    <div class="cards">
+      <div class="card r" style="--d:2"><span class="o">1</span><h3>Ценность до регистрации</h3><p>Если сначала показать, что даёт Looma, и собрать интересы, а форму регистрации дать последней, больше новичков дойдут до первой записи</p><div class="m"><span class="lbl red">Метрика</span><p>Доля дошедших от старта онбординга до первой записи</p></div></div>
+      <div class="card r" style="--d:3"><span class="o">2</span><h3>Всё в одном месте</h3><p>Если собрать занятия, события и людей в одной ленте, не придётся искать по чатам и соцсетям</p><div class="m"><span class="lbl red">Метрика</span><p>Время от открытия приложения до записи</p></div></div>
+      <div class="card r" style="--d:4"><span class="o">3</span><h3>Связь удерживает</h3><p>Если после общей встречи предложить связь и показать «Вашу нить», люди будут возвращаться</p><div class="m"><span class="lbl red">Метрика</span><p>Доля принятых запросов на связь и возврат через 30 дней</p></div></div>
+    </div>
+  </section>
+
+  <!-- scope -->
+  <section class="slide prod" id="scope" data-sec="A">
+    <div class="top r" style="--d:0">
+      <div class="col"><div class="eyebrow"><b>(A)</b><span>Приоритизация</span></div><h2 class="h2">Скоуп MVP</h2></div>
+      <div class="col"><span class="lbl">Фокус</span><p class="lead" style="max-width:980px">Главный путь: найти занятие, прийти и познакомиться. Остальное — в следующие версии</p></div>
+    </div>
+    <div class="cards c2">
+      <div class="card r" style="--d:1"><span class="lbl red">Вошло в MVP</span><div class="list">
+        <div><b>Онбординг с выбором роли</b><span>Без него не собрать персональную подборку</span></div>
+        <div><b>Лента «Для тебя»</b><span>Главная точка входа: занятия, события и люди</span></div>
+        <div><b>Запись на занятие</b><span>Ключевое действие и главная метрика</span></div>
+        <div><b>Связи и «Ваша нить»</b><span>Отличает Looma от расписаний и афиш</span></div>
+        <div><b>Кабинет педагога</b><span>Без педагогов нет занятий в ленте</span></div></div></div>
+      <div class="card r" style="--d:2"><span class="lbl">Отложила</span><div class="list">
+        <div><b>Чат между пользователями</b><span>Сначала проверить, нужны ли связи вообще</span></div>
+        <div><b>Оплата внутри приложения</b><span>Сложно и дорого; на старте — переход к студии</span></div>
+        <div><b>Отзывы и рейтинги педагогов</b><span>Нужна база занятий, чтобы было что оценивать</span></div>
+        <div><b>Уведомления о пересечениях</b><span>Добавлю, когда связи начнут расти</span></div></div></div>
+    </div>
+  </section>
+
+  <!-- teacher value -->
+  <section class="slide prod" id="teacher" data-sec="A">
+    <div class="top r" style="--d:0">
+      <div class="col"><div class="eyebrow"><b>(A)</b><span>Предложение</span></div><h2 class="h2">Зачем педагогу Looma</h2></div>
+      <div class="col"><span class="lbl">Ценность</span><p class="lead" style="max-width:980px">Looma приводит педагогу новых учеников и берёт на себя организацию занятий</p></div>
+    </div>
+    <div class="cards">
+      <div class="card r" style="--d:1"><span class="o">1</span><h3>Новые ученики</h3><p>Занятие показывается в ленте тем, кто ищет этот стиль и уровень рядом. Поток людей без рекламы</p></div>
+      <div class="card r" style="--d:2"><span class="o">2</span><h3>Всё в одном месте</h3><p>Опубликовал занятие один раз — и оно в ленте, у учеников и со списком записавшихся. Вместо закрепов, директа и «плюсиков»</p></div>
+      <div class="card r" style="--d:3"><span class="o">3</span><h3>Понятно, кто придёт</h3><p>Записи заранее и напоминания ученикам. Меньше пустых мест и проще планировать зал</p></div>
+    </div>
+    <div class="r" style="--d:4"><span class="lbl red">Оффер для первых педагогов</span><p class="quoteln" style="margin-top:16px">«Перенесу твоё расписание в Looma сама — тебе ничего не нужно делать. Для первых педагогов — бесплатно навсегда»</p></div>
+  </section>
+
+  <!-- business -->
+  <section class="slide prod" id="biz" data-sec="A">
+    <div class="top r" style="--d:0">
+      <div class="col"><div class="eyebrow"><b>(A)</b><span>Монетизация</span></div><h2 class="h2">Бизнес-модель</h2></div>
+      <div class="col"><span class="lbl">Как зарабатываем</span><p class="lead" style="max-width:980px">Для танцоров Looma бесплатна. Зарабатываем на педагогах — тогда, когда приводим им учеников</p></div>
+    </div>
+    <div class="cards">
+      <div class="card r" style="--d:1"><span class="lbl red">Основная модель</span><h3>Комиссия с записей</h3><p>Процент с каждой оплаченной записи или билета, пришедших через Looma</p><div class="m"><span class="lbl">Например, 5–10%</span></div></div>
+      <div class="card r" style="--d:2"><span class="lbl">Подписка</span><h3>Looma Pro</h3><p>Продвижение в ленте, статистика просмотров и записей, больше групп</p><div class="m"><span class="lbl">Например, 990–1 490 ₽/мес</span></div></div>
+      <div class="card r" style="--d:3"><span class="lbl">Дополнительно</span><h3>Продвижение событий</h3><p>Платное размещение фестивалей и батлов наверху ленты</p><div class="m"><span class="lbl">Разовые размещения</span></div></div>
+    </div>
+    <div class="card r" style="--d:4;padding:30px 40px"><span class="lbl red">Как польза превращается в выручку</span>
+      <div class="chain">
+        <div class="cs"><b>Записи в неделю</b><small>главная метрика</small></div><svg viewBox="0 0 34 14"><path d="M1 7H31M26 2l5 5-5 5"/></svg>
+        <div class="cs op"><b>× средний чек</b></div><svg viewBox="0 0 34 14"><path d="M1 7H31M26 2l5 5-5 5"/></svg>
+        <div class="cs"><b>GMV</b><small>оборот через Looma</small></div><svg viewBox="0 0 34 14"><path d="M1 7H31M26 2l5 5-5 5"/></svg>
+        <div class="cs op"><b>× комиссия + Pro</b></div><svg viewBox="0 0 34 14"><path d="M1 7H31M26 2l5 5-5 5"/></svg>
+        <div class="cs end"><b>Выручка</b><small>бизнес-метрика</small></div>
+      </div></div>
+  </section>
+
+  <!-- 5 metaphor -->
+  <section class="slide" id="s5" data-sec="B">
+    <div class="left">
+      <div class="r" style="--d:0"><div class="eyebrow"><b>(B)</b><span>Метафора</span></div></div>
+      <h2 class="h2 r" style="--d:1">Красная нить — метафора связи между людьми</h2>
+      <div class="steps">
+        <div class="step r" style="--d:2"><div class="o">1</div><div><h3>Пересечения</h3><p>Вы встречаетесь в танцевальной среде: на занятиях, событиях или через общие интересы</p></div></div>
+        <div class="step r" style="--d:3"><div class="o">2</div><div><h3>Связь</h3><p>Вы добавляете друг друга и устанавливаете связь</p></div></div>
+        <div class="step r" style="--d:4"><div class="o">3</div><div><h3>Ваша нить</h3><p>История всех ваших пересечений собирается в одну нить — историю ваших общих точек</p></div></div>
+      </div>
+    </div>
+    <div class="panel ri" style="--d:1">
+      <img class="bg" src="img/metaphor-bg.webp" alt="">
+      <div class="orbit a"></div><div class="orbit b"></div>
+      <img class="phone" src="img/connected.webp" alt="Экран «Связь установлена»" data-tilt>
+    </div>
+  </section>
+
+  <!-- 6 gallery -->
+  <section class="slide" id="s6" data-sec="B">
+    <div class="top r" style="--d:0">
+      <div class="col"><div class="eyebrow"><b>(B)</b></div><h2 class="h2">Образы</h2></div>
+      <div class="col"><span class="lbl">Визуальный язык</span><p class="lead">Тёмная сцена, тёплый свет на коже и красная нить, которая проходит через каждый кадр</p></div>
+    </div>
+    <div class="acc r" style="--d:2">
+      <figure><img src="img/g-dancer.webp" alt="Танцовщица с красной нитью"><figcaption>Движение</figcaption></figure>
+      <figure><img src="img/g-hands.webp" alt="Руки тянутся друг к другу"><figcaption>Касание</figcaption></figure>
+      <figure><img src="img/g-jump.webp" alt="Танцор в прыжке"><figcaption>Полёт</figcaption></figure>
+      <figure><img src="img/cover.webp" alt="Руки, связанные нитью"><figcaption>Связь</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- 7 logo -->
+  <section class="slide" id="s7" data-sec="B">
+    <div class="top r" style="--d:0">
+      <div class="col"><div class="eyebrow"><b>(B)</b></div><h2 class="h2">Логотип</h2></div>
+      <div class="col"><span class="lbl">Идея</span><p class="lead">Нить проходит сквозь буквы и связывает их в одно слово. Иконка собрана из той же нити</p></div>
+    </div>
+    <div class="duo">
+      <div class="tile r" style="--d:1"><img class="lg" src="img/logo.webp" alt="Логотип LOOMA"><div class="sheen"></div><span class="cap">Wordmark</span></div>
+      <div class="tile r" style="--d:2"><img class="ic" src="img/appicon.webp" alt="Иконка приложения"><span class="cap">App icon</span></div>
+    </div>
+  </section>
+
+  <!-- 8 UI kit colours + components -->
+  <section class="slide" id="s8" data-sec="B">
+    <div class="pal">
+      <div class="r" style="--d:0"><div class="eyebrow"><b>(B)</b><span>UI Kit</span></div><h2 class="h2" style="margin-top:14px">Цвет</h2></div>
+      <div class="grp r" style="--d:1"><span class="lbl">Background</span><div class="sw">
+        <button class="s" data-hex="#0F0F0F"><i style="background:#0F0F0F"></i><span>Primary</span><small>#0F0F0F</small></button>
+        <button class="s" data-hex="#282727"><i style="background:#282727"></i><span>Secondary</span><small>#282727</small></button>
+        <button class="s" data-hex="#151515"><i style="background:#151515"></i><span>Tertiary</span><small>#151515</small></button></div></div>
+      <div class="grp r" style="--d:2"><span class="lbl">Text</span><div class="sw">
+        <button class="s" data-hex="#FFFFFF"><i style="background:#FFFFFF"></i><span>White</span><small>#FFFFFF</small></button>
+        <button class="s" data-hex="#FFFFFF 60%"><i style="background:rgba(255,255,255,.6)"></i><span>Grey</span><small>#FFFFFF 60%</small></button>
+        <button class="s" data-hex="#B8B8C7"><i style="background:#B8B8C7"></i><span>Light Grey</span><small>#B8B8C7</small></button>
+        <button class="s" data-hex="#FFFFFF 40%"><i style="background:rgba(255,255,255,.4)"></i><span>Muted</span><small>#FFFFFF 40%</small></button></div></div>
+      <div class="grp r" style="--d:3"><span class="lbl">Stroke</span><div class="sw">
+        <button class="s" data-hex="#3C3C3C"><i style="background:#3C3C3C"></i><span>Grey</span><small>#3C3C3C</small></button>
+        <button class="s" data-hex="#FFFFFF 10%"><i style="background:rgba(255,255,255,.1)"></i><span>Light</span><small>#FFFFFF 10%</small></button>
+        <button class="s" data-hex="#FFFFFF 25%"><i style="background:rgba(255,255,255,.25)"></i><span>White</span><small>#FFFFFF 25%</small></button></div></div>
+      <div class="grp r" style="--d:4"><span class="lbl">Accent</span><div class="sw">
+        <button class="s" data-hex="#FE5D57"><i style="background:#FE5D57"></i><span>Red</span><small>#FE5D57</small></button>
+        <button class="s" data-hex="#6B0F0C"><i style="background:#6B0F0C"></i><span>Dark Red</span><small>#6B0F0C</small></button>
+        <button class="s" data-hex="#9E0500"><i style="background:#9E0500"></i><span>Deep Red</span><small>#9E0500</small></button>
+        <button class="s" data-hex="#983834"><i style="background:#983834"></i><span>Muted Red</span><small>#983834</small></button></div></div>
+    </div>
+    <div class="comps">
+      <h2 class="h2 r" style="--d:0;margin-top:41px">Компоненты</h2>
+      <div class="grp r" style="--d:1"><span class="lbl">Buttons</span><div class="btnrow"><button class="b-pri">Начать</button><button class="b-sec">Продолжить</button></div></div>
+      <div class="grp r" style="--d:2"><span class="lbl">Input</span><div class="btnrow"><input class="inp" id="kit-input" placeholder="Введите значение" aria-label="Пример поля ввода"></div></div>
+      <div class="grp r" style="--d:3"><span class="lbl">Cards</span><div class="btnrow" style="align-items:flex-start;flex-wrap:nowrap"><img class="cardimg" src="img/card-person.webp" alt="Карточка человека" style="width:310px"><img class="cardimg" src="img/card-event.webp" alt="Карточка события" style="width:310px"></div></div>
+    </div>
+    <div class="toast" id="toast">Скопировано</div>
+  </section>
+
+  <!-- 9 type -->
+  <section class="slide" id="s9" data-sec="B">
+    <div class="r" style="--d:0"><div class="eyebrow"><b>(B)</b><span>UI Kit</span></div><h2 class="h2" style="margin-top:14px">Типографика</h2></div>
+    <div class="faces">
+      <div class="face r" style="--d:1;font-family:var(--serif)">
+        <div class="nm" style="font-family:var(--sans)">Cormorant Garamond · заголовки</div>
+        <div class="aa">Аа</div>
+        <div class="tr" style="font-size:48px;font-weight:600">Heading H1 <small>SemiBold / 48</small></div>
+        <div class="tr" style="font-size:40px;font-weight:600">Heading H2 <small>SemiBold / 40</small></div>
+        <div class="tr" style="font-size:36px">Subtitle H1 <small>Regular / 36</small></div>
+        <div class="tr" style="font-size:32px">Subtitle H2 <small>Regular / 32</small></div>
+      </div>
+      <div class="face r" style="--d:2">
+        <div class="nm">Inter · интерфейс</div>
+        <div class="aa" style="font-weight:300">Аа</div>
+        <div class="tr" style="font-size:26px;font-weight:500">Button Medium <small>Medium / 18</small></div>
+        <div class="tr" style="font-size:24px">Body Regular <small>Regular / 16</small></div>
+        <div class="tr" style="font-size:24px;font-weight:500">Body Medium <small>Medium / 16</small></div>
+        <div class="tr" style="font-size:21px">Caption Regular <small>Regular / 12</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 hero -->
+  <section class="slide" id="s10" data-sec="C">
+    <img class="mock ri" src="img/mock-hand.webp" alt="Приложение Looma на экране телефона" data-par="24">
+    <div class="shade"></div>
+    <div class="ov"><div class="eyebrow r" style="--d:1"><b>(C)</b></div><h2 class="hd r" style="--d:2">Проекти&shy;рование</h2></div>
+  </section>
+
+  <!-- 11 onboarding -->
+  <section class="slide" id="s11" data-sec="C">
+    <div class="top r" style="--d:0">
+      <div class="col"><div class="eyebrow"><b>(C)</b></div><h2 class="h2">Онбординг</h2></div>
+      <div class="col"><span class="lbl">Задача</span><p class="lead" style="max-width:900px">Познакомить пользователя с возможностями Looma и показать ценность приложения до того, как он начнёт искать занятия</p></div>
+    </div>
+    <div class="phones">
+      <div class="ph r" style="--d:1"><img src="img/ob1.webp" alt="Стартовый экран"><span class="n">Старт</span></div>
+      <div class="ph r" style="--d:2"><img src="img/ob2.webp" alt="Выбор роли"><span class="n">Роль</span></div>
+      <div class="ph r" style="--d:3"><img src="img/ob3.webp" alt="Нить рекомендаций"><span class="n">Рекомендации</span></div>
+      <div class="ph r" style="--d:4"><img src="img/ob4.webp" alt="Выбери свой вайб"><span class="n">Вайб</span></div>
+      <div class="ph r" style="--d:5"><img src="img/ob5.webp" alt="Выбор направлений"><span class="n">Направления</span></div>
+      <div class="ph r" style="--d:6"><img src="img/ob6.webp" alt="Создание профиля"><span class="n">Профиль</span></div>
+    </div>
+  </section>
+
+  <!-- 12 recommendations -->
+  <section class="slide" id="s12" data-sec="C">
+    <div class="left">
+      <div class="r" style="--d:0"><div class="eyebrow"><b>(C)</b><span>Главный экран</span></div></div>
+      <h2 class="h2 r" style="--d:1">Персональные рекомендации</h2>
+      <p class="lead r" style="--d:2">Занятия, люди и события подбираются под интересы пользователя</p>
+    </div>
+    <div class="rings ri" style="--d:1">
+      <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div><div class="ring pulse"></div>
+      <div class="ph"><img src="img/home.webp" alt="Главный экран «Для тебя»" data-tilt></div>
+    </div>
+    <div class="blocks">
+      <div class="r" style="--d:3"><span>1</span>Фильтры: люди, занятия, события, стили</div>
+      <div class="r" style="--d:4"><span>2</span>Рекомендуемые люди</div>
+      <div class="r" style="--d:5"><span>3</span>Ближайшие занятия</div>
+      <div class="r" style="--d:6"><span>4</span>Ближайшие события</div>
+      <div class="r" style="--d:7"><span>5</span>Настроить рекомендации</div>
+    </div>
+  </section>
+
+  <!-- 13 stories -->
+  <section class="slide" id="s13" data-sec="C">
+    <div class="left">
+      <div class="r" style="--d:0"><div class="eyebrow"><b>(C)</b><span>Профиль педагога</span></div></div>
+      <h2 class="h2 r" style="--d:1">Stories</h2>
+      <p class="lead r" style="--d:2">Педагог рассказывает о себе в формате историй: кто он, что ждёт на занятиях и кому они подойдут</p>
+    </div>
+    <div class="phones" style="align-items:flex-end">
+      <div class="ph r" style="--d:2"><img src="img/st1.webp" alt="История: Привет! Я Настя"><span class="n">Знакомство</span></div>
+      <div class="ph r" style="--d:3"><img src="img/st2.webp" alt="История: Что тебя ждёт?"><span class="n">Что тебя ждёт</span></div>
+      <div class="ph r" style="--d:4"><img src="img/st3.webp" alt="История: Подойдут ли тебе мои занятия?"><span class="n">Кому подойдёт</span></div>
+    </div>
+  </section>
+
+  <!-- 14 connections -->
+  <section class="slide" id="s14" data-sec="C">
+    <div class="top r" style="--d:0">
+      <div class="col"><div class="eyebrow"><b>(C)</b></div><h2 class="h2">Связи</h2></div>
+      <div class="col"><span class="lbl">Сценарий</span><p class="lead" style="max-width:900px">Найти человека, отправить запрос и получить общую нить — историю ваших пересечений</p></div>
+    </div>
+    <div class="flow phones">
+      <div class="ph r" style="--d:1"><img src="img/people.webp" alt="Экран «Люди»"><span class="n">Люди</span></div>
+      <svg class="conn r" style="--d:2" viewBox="0 0 200 80" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40 C 60 0, 140 80, 200 40"/><circle cx="200" cy="40" r="5"/></svg>
+      <div class="ph r" style="--d:3"><img src="img/request.webp" alt="Экран «Запрос отправлен»"><span class="n">Запрос отправлен</span></div>
+      <svg class="conn r" style="--d:4" viewBox="0 0 200 80" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40 C 60 80, 140 0, 200 40"/><circle cx="200" cy="40" r="5"/></svg>
+      <div class="ph r" style="--d:5"><img src="img/connected.webp" alt="Экран «Связь установлена»"><span class="n">Связь установлена</span></div>
+    </div>
+  </section>
+
+  <!-- live prototype -->
+  <section class="slide" id="proto" data-sec="C">
+    <div class="left">
+      <div class="r" style="--d:0"><div class="eyebrow"><b>(C)</b><span>Живой прототип</span></div></div>
+      <h2 class="h2 r" style="--d:1">Попробуйте Looma</h2>
+      <p class="lead r" style="--d:2">Прототип работает прямо на слайде. Кликайте по экрану телефона</p>
+      <div class="try">
+        <div class="r" style="--d:3"><span>1</span>Онбординг и выбор направлений</div>
+        <div class="r" style="--d:4"><span>2</span>Запись на занятие</div>
+        <div class="r" style="--d:5"><span>3</span>Связь с человеком и ваша нить</div>
+        <div class="r" style="--d:6"><span>4</span>Кабинет педагога: новое занятие</div>
+      </div>
+    </div>
+    <div class="stagewrap ri" style="--d:1">
+      <div class="device"><div class="ph-load">Looma</div><iframe id="protoFrame" title="Интерактивный прототип Looma" data-src="app/index.html" loading="lazy"></iframe></div>
+    </div>
+    <div class="side">
+      <div class="r" style="--d:5" id="qrBlock"><span class="lbl">На телефоне</span><div class="qr" id="qr" style="margin-top:14px"></div></div>
+      <a class="act r" style="--d:6" href="app/index.html" target="_blank" rel="noopener">Открыть отдельно <svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+      <button class="act r" style="--d:7" id="protoReset">Начать заново <svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v5h5"/></svg></button>
+    </div>
+  </section>
+
+  <!-- key decisions -->
+  <section class="slide prod" id="dec" data-sec="C">
+    <div class="top r" style="--d:0">
+      <div class="col"><div class="eyebrow"><b>(C)</b><span>Почему так</span></div><h2 class="h2">Ключевые решения</h2></div>
+      <div class="col"><span class="lbl">Решение и его цена</span><p class="lead">Четыре решения, на которых держится продукт</p></div>
+    </div>
+    <div class="dec">
+      <div class="row r" style="--d:1"><span class="o">1</span><h3>Ценность до регистрации</h3><p>Онбординг сначала показывает, что даёт Looma, и собирает направления и вайб. Регистрация — последней<br><em>Цена:</em> контакт узнаём позже, часть людей уйдёт без регистрации</p></div>
+      <div class="row r" style="--d:2"><span class="o">2</span><h3>Две роли в одном аккаунте</h3><p>Танцор и педагог — часто один человек. Роль можно сменить или совмещать<br><em>Цена:</em> интерфейс сложнее — переключение ролей и два набора разделов</p></div>
+      <div class="row r" style="--d:3"><span class="o">3</span><h3>Stories вместо анкеты</h3><p>Педагог рассказывает о себе в коротких видео — характер видно до первого занятия<br><em>Цена:</em> педагогу нужно снять видео, порог входа выше</p></div>
+      <div class="row r" style="--d:4"><span class="o">4</span><h3>Связь — только по согласию</h3><p>Связь появляется, когда её подтверждают оба. Затем открывается «Ваша нить»<br><em>Цена:</em> сеть растёт медленнее, зато без спама</p></div>
+    </div>
+  </section>
+
+  <!-- 15 research -->
+  <section class="slide" id="s15" data-sec="D">
+    <div class="left">
+      <div class="r" style="--d:0"><div class="eyebrow"><b>(D)</b><span>Тестирование</span></div></div>
+      <h2 class="h2 r" style="--d:1">Продуктовое исследование</h2>
+      <p class="lead r" style="--d:2">Гипотеза: педагог без подсказок справится с ключевыми задачами кабинета</p>
+      <div class="r" style="--d:3;margin-top:auto"><div class="ten">10</div><p class="lbl" style="margin-top:18px">педагогов · лично, на танцевальных встречах</p></div>
+    </div>
+    <div>
+      <div class="tbl rs">
+        <div class="row h r" style="--d:1"><span></span><span class="lbl">Сценарий</span><span class="lbl">Результат</span></div>
+        <div class="row r" style="--d:2"><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></span><span class="sc">Создать занятие</span><span class="res">Справились</span></div>
+        <div class="row r" style="--d:3"><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></span><span class="sc">Опубликовать занятие</span><span class="res"><span>Справились, но кнопку «Опубликовать» замечали не сразу<small>Исправила — кнопка стала главной на экране</small></span></span></div>
+        <div class="row r" style="--d:4"><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></span><span class="sc">Найти созданное занятие</span><span class="res">Справились</span></div>
+        <div class="row r" style="--d:5"><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></span><span class="sc">Отменить занятие</span><span class="res">Справились</span></div>
+      </div>
+      <div class="out">
+        <div class="r" style="--d:6"><span class="lbl">Вывод</span><p>Гипотеза подтвердилась. Одно узкое место — кнопка «Опубликовать»</p></div>
+        <div class="r" style="--d:7"><span class="lbl">Что изменила</span><p>Ссылку в шапке формы заменила на главную кнопку внизу</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- conclusions -->
+  <section class="slide prod" id="out" data-sec="D">
+    <div class="top r" style="--d:0">
+      <div class="col"><div class="eyebrow"><b>(D)</b><span>Итоги</span></div><h2 class="h2">Выводы</h2></div>
+      <div class="col"><span class="lbl">Дальше</span><p class="lead">Что дал проект и что я проверила бы следующим шагом</p></div>
+    </div>
+    <div class="cards c2">
+      <div class="card r" style="--d:1"><span class="lbl red">Что получилось</span><div class="list">
+        <div><b>Метафора нити собрала продукт, айдентику и интерфейс вокруг одной идеи</b></div>
+        <div><b>Тест показал, что сценарии педагога понятны</b></div>
+        <div><b>Главная находка — кнопку «Опубликовать» замечали не сразу. Сделала её заметнее</b></div></div></div>
+      <div class="card r" style="--d:2"><span class="lbl">Что дальше</span><div class="list">
+        <div><b>A/B-тест: онбординг с ценностью против регистрации сразу</b><span>Метрика — доля дошедших до первой записи</span></div>
+        <div><b>Протестировать путь танцора</b><span>Поиск занятия, запись и установление связи</span></div>
+        <div><b>Следить за долей принятых связей</b><span>Так проверяется гипотеза «Связь удерживает»</span></div></div></div>
+    </div>
+  </section>
+
+  <!-- 16 end -->
+  <section class="slide" id="s16" data-sec="Кейс">
+    <img class="th ri" src="img/thread.webp" alt="" data-par="20">
+    <h2 class="big r" style="--d:1">Спасибо <span>за</span> внимание</h2>
+    <div class="meta">
+      <div class="r" style="--d:3"><span class="lbl">Продуктовый дизайнер</span><p>Екатерина Богданова</p></div>
+      <div class="r" style="--d:4"><span class="lbl">Роль в проекте</span><p>Соло, 2 месяца</p></div>
+      <div class="r" style="--d:5"><span class="lbl">Telegram</span><p><a href="https://t.me/ekateribog_dana" target="_blank" rel="noopener">@ekateribog_dana ↗</a></p></div>
+      <div class="r" style="--d:6"><span class="lbl">Behance</span><p><a href="https://www.behance.net/ekateribo" target="_blank" rel="noopener">behance.net/ekateribo ↗</a></p></div>
+      <div class="r" style="--d:7"><span class="lbl">Почта</span><p><a href="mailto:ekateribogdana@yandex.ru">ekateribogdana@yandex.ru</a></p></div>
+      <div class="r" style="--d:8"><span class="lbl">AI-инструменты</span><p>ChatGPT, Claude, Figma Agent</p></div>
+    </div>
+  </section>
+
+  <div class="chrome">
+    <div class="progress"><svg id="prog" viewBox="0 0 1380 40" preserveAspectRatio="none" aria-label="Прогресс презентации"></svg></div>
+    <div class="nav">
+      <span class="count" id="count"><b>01</b></span>
+      <button class="arrow" id="prev" aria-label="Предыдущий слайд"><svg viewBox="0 0 24 24"><path d="M20 12H4M10 6l-6 6 6 6"/></svg></button>
+      <button class="arrow" id="next" aria-label="Следующий слайд"><svg viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6"/></svg></button>
+    </div>
+  </div>
+  <div class="hint" id="hint">← → листайте клавишами, колесом или свайпом</div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+(function(){
+  const stage=document.getElementById('stage');
+  const slides=[...document.querySelectorAll('.slide')];
+  const N=slides.length;
+  let cur=0, scale=1, lock=0;
+
+  function fit(){
+    scale=Math.min(window.innerWidth/1920,window.innerHeight/1080);
+    stage.style.transformOrigin='50% 50%';
+    stage.style.transform=`translate(-50%,-50%) scale(${scale})`;
+  }
+  window.addEventListener('resize',fit); fit();
+
+  /* progress thread */
+  const prog=document.getElementById('prog');
+  const W=1380, pts=[];
+  let d='M0 20';
+  for(let x=0;x<=W;x+=10){ const y=20+Math.sin(x/70)*7*Math.sin(x/390+0.6); d+=` L${x} ${y.toFixed(2)}`; }
+  prog.innerHTML=`<path class="base" d="${d}"/><path class="fill" id="pf" d="${d}" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>`;
+  const base=prog.querySelector('.base'), total=base.getTotalLength();
+  const posFor=i=>{ const L=total*(i/(N-1)); return base.getPointAtLength(L); };
+  const secs=['A','B','C','D'].map(t=>({t,i:slides.findIndex(s=>s.dataset.sec===t)})).filter(s=>s.i>=0);
+  document.querySelectorAll('[data-goid]').forEach(el=>{const k=slides.findIndex(s=>s.id===el.dataset.goid); if(k>=0) el.dataset.go=k;});
+  secs.forEach(s=>{ const p=posFor(s.i);
+    prog.insertAdjacentHTML('beforeend',`<circle class="mark" data-go="${s.i}" cx="${p.x}" cy="${p.y}" r="7"><title>Раздел ${s.t}</title></circle><text class="mtx" x="${p.x}" y="${p.y-18}" text-anchor="middle">${s.t}</text>`); });
+  prog.insertAdjacentHTML('beforeend','<circle class="knot" id="knot" r="6" cx="0" cy="20"/>');
+  const pf=document.getElementById('pf'), knot=document.getElementById('knot');
+
+  function go(i){
+    i=Math.max(0,Math.min(N-1,i));
+    slides[cur].classList.remove('active');
+    cur=i; slides[cur].querySelectorAll('.done').forEach(el=>el.classList.remove('done'));
+    slides[cur].classList.add('active');
+    if(cur===protoIdx||cur===protoIdx-1) loadProto();
+    const k=i/(N-1); pf.style.strokeDashoffset=1-k;
+    const p=posFor(i); knot.setAttribute('cx',p.x); knot.setAttribute('cy',p.y);
+    prog.querySelectorAll('.mark').forEach(m=>m.classList.toggle('on',+m.dataset.go<=i));
+    document.getElementById('count').innerHTML=`<b>${String(i+1).padStart(2,'0')}</b> / ${N}`;
+    document.getElementById('prev').disabled=i===0;
+    document.getElementById('next').disabled=i===N-1;
+    if(i>0) document.getElementById('hint').style.opacity=0;
+    try{ history.replaceState(null,'','#'+slides[i].id); }catch(e){}
+  }
+  const next=()=>go(cur+1), prev=()=>go(cur-1);
+  document.getElementById('next').onclick=next;
+  document.getElementById('prev').onclick=prev;
+  document.addEventListener('click',e=>{ const g=e.target.closest('[data-go]'); if(g) go(+g.dataset.go); });
+  document.addEventListener('keydown',e=>{
+    if(e.target.matches('input')) return;
+    if((e.key===' '||e.key==='Enter')&&e.target.closest('button')) return;
+    if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){ e.preventDefault(); next(); }
+    if(['ArrowLeft','PageUp'].includes(e.key)){ e.preventDefault(); prev(); }
+    if(e.key==='Home') go(0); if(e.key==='End') go(N-1);
+  });
+  window.addEventListener('wheel',e=>{
+    const now=Date.now(); if(now-lock<900||Math.abs(e.deltaY)<25) return;
+    lock=now; e.deltaY>0?next():prev();
+  },{passive:true});
+  let tx=null,ty=null;
+  window.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+  window.addEventListener('touchend',e=>{ if(tx==null) return;
+    const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+    if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)) dx<0?next():prev(); tx=null; },{passive:true});
+
+  /* ambient cursor glow + parallax + tilt */
+  const glow=document.getElementById('glow');
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  stage.addEventListener('mousemove',e=>{
+    const r=stage.getBoundingClientRect();
+    const x=(e.clientX-r.left)/scale, y=(e.clientY-r.top)/scale;
+    glow.style.transform=`translate(${x}px,${y}px)`;
+    if(reduce) return;
+    const nx=x/1920-.5, ny=y/1080-.5;
+    slides[cur].querySelectorAll('[data-par]').forEach(el=>{
+      const k=+el.dataset.par; el.style.transform=`translate(${-nx*k}px,${-ny*k}px) scale(1.02)`;
+    });
+  });
+  document.querySelectorAll('[data-tilt]').forEach(el=>{
+    const host=el.closest('.panel')||el.closest('.rings')||el;
+    host.addEventListener('mousemove',e=>{
+      if(reduce) return;
+      const r=el.getBoundingClientRect();
+      const nx=(e.clientX-r.left)/r.width-.5, ny=(e.clientY-r.top)/r.height-.5;
+      const baseT=el.classList.contains('phone')?'translateX(-50%) translateY(-14px) ':'';
+      el.style.transform=`${baseT}perspective(1400px) rotateY(${nx*10}deg) rotateX(${-ny*8}deg)`;
+    });
+    host.addEventListener('mouseleave',()=>{ el.style.transform=''; });
+  });
+
+  /* circles: light connecting threads on hover */
+  const lines=[...document.querySelectorAll('.links line')];
+  document.querySelectorAll('.circ').forEach(c=>{
+    c.addEventListener('mouseenter',()=>lines.forEach(l=>{ l.style.opacity=(l.dataset.a===c.dataset.i||l.dataset.b===c.dataset.i)?.9:0; }));
+    c.addEventListener('mouseleave',()=>lines.forEach(l=>l.style.opacity=0));
+  });
+
+  /* copy colour */
+  const toast=document.getElementById('toast'); let tt;
+  document.querySelectorAll('[data-hex]').forEach(b=>b.addEventListener('click',()=>{
+    const v=b.dataset.hex;
+    const done=()=>{ toast.textContent='Скопировано: '+v; toast.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>toast.classList.remove('show'),1600); };
+    try{ navigator.clipboard.writeText(v).then(done,()=>{ toast.textContent=v; toast.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>toast.classList.remove('show'),1600); }); }catch(e){ done(); }
+  }));
+
+  document.addEventListener('animationend',e=>{ const el=e.target; if(el.classList&&(el.classList.contains('r')||el.classList.contains('ri'))&&(e.animationName==='rise'||e.animationName==='fadeIn')) el.classList.add('done'); });
+
+  /* live prototype: load on first visit, QR for phones */
+  const pframe=document.getElementById('protoFrame');
+  const loadProto=()=>{ if(pframe && !pframe.src) pframe.src=pframe.dataset.src; };
+  const protoIdx=slides.findIndex(s=>s.id==='proto');
+  document.getElementById('protoReset').addEventListener('click',()=>{
+    try{ pframe.contentWindow.localStorage.removeItem('looma'); }catch(e){}
+    try{ localStorage.removeItem('looma'); }catch(e){}
+    pframe.src=pframe.dataset.src+'?r='+Date.now();
+  });
+  const host=location.hostname;
+  const qrOk=/^https?:$/.test(location.protocol) && !/claude|anthropic|usercontent|localhost|^127\./.test(host);
+  if(qrOk && window.QRCode){ try{ new QRCode(document.getElementById('qr'),{text:new URL('app/',location.href).href,width:376,height:376,colorDark:'#0F0F0F',colorLight:'#F4F0EC',correctLevel:QRCode.CorrectLevel.M}); }catch(e){ document.getElementById('qrBlock').hidden=true; } }
+  else document.getElementById('qrBlock').hidden=true;
+  const start=slides.findIndex(s=>'#'+s.id===location.hash);
+  go(start>=0?start:0);
+})();
+</script>
+</body>
+</html>
