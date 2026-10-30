@@ -202,7 +202,7 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
 .pagehead .icons{display:flex;gap:var(--s-3)}
 /* --- Tab bar --- */
 .tabbar{flex:none;height:calc(64px + var(--sab));display:grid;grid-template-columns:repeat(4,1fr);align-items:center;padding:0 var(--s-2) var(--sab);background:var(--bg-0);position:relative;z-index:3}
-.tabbar button{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:var(--fs-caption);color:var(--fg-2);height:100%;justify-content:center;transition:color var(--dur-base)}
+.tabbar button{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;color:var(--fg-2);height:100%;justify-content:center;transition:color var(--dur-base)}
 .tabbar button svg{width:var(--icon-m);height:var(--icon-m);transition:transform var(--dur-base) var(--ease)}
 .tabbar button:active svg{transform:scale(.85)}
 .tabbar button.on{color:var(--accent)}
@@ -374,7 +374,7 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
 .pcard .st{color:var(--fg-2);margin-top:6px}
 .pcard .ct{color:var(--fg-2);margin-top:var(--s-1)}
 .pcard .acts{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:var(--s-3)}
-.pcard .acts .btn{width:100%;height:var(--control-xs);font-size:var(--fs-label)}
+.pcard .acts .btn{width:100%;height:36px;font-size:var(--fs-label)}
 /* Days */
 .days{display:grid;grid-template-columns:24px minmax(0,1fr) 24px;align-items:center;gap:10px;margin:0 0 var(--s-6)}
 .days .arr{width:24px;height:24px;display:grid;place-items:center;color:var(--fg-1)}
@@ -456,7 +456,7 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
 .state .what{margin-top:var(--s-3);font-size:var(--fs-body);line-height:28px;animation:rise .6s var(--ease) .8s both}
 .state .who{display:flex;align-items:center;gap:10px;color:#e6e6e6;font-size:var(--fs-body);height:30px;animation:rise .6s var(--ease) .9s both}
 .state .who img,.state .who .ini{width:var(--avatar-m);height:var(--avatar-m)}
-.state .ctas{position:absolute;left:var(--gutter);right:var(--gutter);bottom:calc(64px + var(--sab) + 27px);display:grid;gap:11px;z-index:2;animation:rise .6s var(--ease) 1s both}
+.state .ctas{position:absolute;left:var(--gutter);right:var(--gutter);bottom:calc(64px + var(--sab) + 28px);display:grid;gap:12px;z-index:2;animation:rise .6s var(--ease) 1s both}
 .state .ctas.one{left:var(--gutter);right:var(--gutter)}
 .state .av-big{width:var(--avatar-3xl);height:var(--avatar-3xl);border:1px solid var(--accent);animation:pop .6s var(--ease) .2s both}
 .state .tabbar{background:transparent;z-index:2}
@@ -639,6 +639,14 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
 .records-tabs{padding-top:0}
 .pay-note{text-align:center;color:var(--fg-3);font-size:var(--fs-label);line-height:var(--lh-base);margin-top:-2px}
 
+
+/* QA: tap targets ≥ 44px без изменения визуала */
+.sec .link,.psec .link{min-height:44px;margin:-12px 0;padding:0 2px}
+.days .arr{width:24px;height:44px;margin:-10px 0}
+.btn-xs{height:36px}
+.ob-login button{min-height:44px;padding:0 6px;margin:-12px 0}
+.reset-demo{min-height:44px}
+.hero .who .links.pp-other{min-height:44px;margin-top:10px}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}}
 </style></head><body>
 
@@ -1743,7 +1751,7 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
     if(d.edit){e.stopPropagation();openForm(cls(d.edit));return}
     // generic
     if(d.toast!==undefined){const [a,b]=d.toast.split('|');toast(a,b||'','info');closeOverlay(sheet);return}
-    if(d.nav){ buzz(5); const root=d.nav==='profile'?profileScreen():d.nav==='second'?(state.role==='teacher'?'s-lessons':'s-fav'):d.nav; if(d.nav==='profile')state.currentPerson=meId(); if(t.classList.contains('on')){ if(stack.length){stack=[];show(root,{mode:'tab'})} else {const sc=$('#'+active+' .scroll');sc&&sc.scrollTo({top:0,behavior:'smooth'})} return } tabTo(root); return}
+    if(d.nav){ buzz(5); const root=d.nav==='profile'?profileScreen():d.nav==='second'?(state.role==='teacher'?'s-lessons':'s-fav'):d.nav; if(d.nav==='profile'){ state.currentPerson=meId(); if(active==='s-person'&&root==='s-person'){ stack=[]; onShow['s-person'](); replay($('#s-person')); $('#s-person .scroll').scrollTo({top:0}); syncTabbars(); return } } if(t.classList.contains('on')){ if(stack.length){stack=[];show(root,{mode:'tab'})} else {const sc=$('#'+active+' .scroll');sc&&sc.scrollTo({top:0,behavior:'smooth'})} return } tabTo(root); return}
     if(d.section){sectionTo(d.section);return}
     if(d.go){show(d.go);return}
     if('back' in d){back();return}
