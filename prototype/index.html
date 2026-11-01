@@ -987,14 +987,14 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
     <h2 class="ob-title" style="margin-top:28px" id="dirs-title">Какие направления<br>вам интересны?</h2>
     <p class="ob-sub" id="dirs-sub" hidden></p>
     <div class="dirs" id="dirs">
-      <button aria-pressed="false" class="dir on" data-dir="Hip Hop"><i></i>Hip Hop</button><button aria-pressed="false" class="dir" data-dir="Vogue"><i></i>Vogue</button>
+      <button aria-pressed="false" class="dir" data-dir="Hip Hop"><i></i>Hip Hop</button><button aria-pressed="false" class="dir" data-dir="Vogue"><i></i>Vogue</button>
       <button aria-pressed="false" class="dir" data-dir="High Heels"><i></i>High Heels</button><button aria-pressed="false" class="dir" data-dir="Ballet"><i></i>Ballet</button>
       <button aria-pressed="false" class="dir" data-dir="Contemporary"><i></i>Contemporary</button><button aria-pressed="false" class="dir" data-dir="Jazz Funk"><i></i>Jazz Funk</button>
-      <button aria-pressed="false" class="dir on" data-dir="Frame Up"><i></i>Frame Up</button><button aria-pressed="false" class="dir" data-dir="House"><i></i>House</button>
+      <button aria-pressed="false" class="dir" data-dir="Frame Up"><i></i>Frame Up</button><button aria-pressed="false" class="dir" data-dir="House"><i></i>House</button>
       <button aria-pressed="false" class="dir other" data-dir="Другое"><i></i>Другое</button>
     </div>
     <div class="lvls" id="ob-levels" hidden style="margin-top:24px"><p class="fg-2" style="font-size:13px;line-height:1.3;margin-bottom:12px">Уровень групп</p><div class="chips-wrap"><button class="chip on" data-lvl>Начинающие</button><button class="chip on" data-lvl>Продолжающие</button><button class="chip" data-lvl>Профи</button></div></div>
-    <div class="cta"><button class="btn btn-primary" id="dirs-next" data-ob-next>Продолжить</button></div>
+    <div class="cta"><button class="btn btn-primary" id="dirs-next" data-ob-next disabled>Продолжить</button></div>
   </div>
 
   <div class="ob-step" id="ob-t1" hidden>
@@ -1559,7 +1559,7 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
 
   /* ================= STATE ================= */
   const state={
-    role:'dancer', dirs:new Set(['Hip Hop','Frame Up']),
+    role:'dancer', dirs:new Set(),
     enrolled:new Set(['c1']), favEvents:new Set(), favLessons:new Set(), tickets:new Set(),
     connections:{}, pendingPerson:null, requestTimers:{},
     classDay:TODAY_S, eventDay:TODAY_S, eventFilter:'all', peopleFilter:'teacher',
@@ -1682,6 +1682,7 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
   function obProgress(n){ const seq=obSeq(), idx=seq.indexOf(n), bars=6; const pr=$('#ob-prog');
     if(pr.children.length!==bars)pr.innerHTML='<i></i>'.repeat(bars);
     $$('#ob-prog i').forEach((i,k)=>{i.classList.toggle('done',k+1<idx);i.classList.toggle('cur',k+1===idx)}) }
+  function syncDirsNext(){ $('#dirs-next').disabled=!$$('.dir.on').length }
   function obPrep(n){ const t=state.role==='teacher';
     if(n==='4'){ $('#dirs-title').innerHTML=t?'Что вы<br>преподаёте?':'Какие направления<br>вам интересны?'; $('#dirs').style.marginTop=t?'24px':''; $('#ob-levels').hidden=!t }
     if(n==='5'){ 
@@ -2085,7 +2086,7 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
     if('obLogin' in d){finishOb();return}
     if('eye' in d){const i=t.previousElementSibling;i.type=i.type==='password'?'text':'password';return}
     if(d.role){$$('.rolecard').forEach(r=>r.classList.toggle('on',r===t));return}
-    if(d.dir){t.classList.toggle('on');t.setAttribute('aria-pressed',t.classList.contains('on'));if(t.classList.contains('on'))state.dirs.add(d.dir);else state.dirs.delete(d.dir);return}
+    if(d.dir){t.classList.toggle('on');t.setAttribute('aria-pressed',t.classList.contains('on'));if(t.classList.contains('on'))state.dirs.add(d.dir);else state.dirs.delete(d.dir);syncDirsNext();return}
     // nested actions
     if(d.favEv){e.stopPropagation();const id=d.favEv;const on=!state.favEvents.has(id);on?state.favEvents.add(id):state.favEvents.delete(id);t.classList.toggle('on',on);buzz();save();toast(on?'Добавлено в избранное':'Убрано из избранного',E[id].title,'info');if(active==='s-fav')setTimeout(()=>onShow['s-fav'](),400);return}
     if(d.cancelId){e.stopPropagation();unenroll(d.cancelId);return}
@@ -2102,7 +2103,7 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
     if('filtersReset' in d){state.filters={style:'all',level:'all',date:'all',format:'all'};syncFilterChips();return}
     if('filtersApply' in d){applyFilters();return}
     if(d.v&&t.closest('[data-fgroup]')){state.filters[t.closest('[data-fgroup]').dataset.fgroup]=d.v;syncFilterChips();return}
-    if('reco' in d){closeOverlay(filters);obStep='4';obPrep('4');$$('.dir').forEach(b=>{b.classList.toggle('on',state.dirs.has(b.dataset.dir));b.setAttribute('aria-pressed',b.classList.contains('on'))});obProgress('4');$$('.ob-bg').forEach(b=>b.classList.toggle('hidden-bg',!b.classList.contains('dirs-bg')));$('#ob-head').hidden=false;$('[data-ob-prev]',$('#ob-head')).hidden=true;$$('.ob-step').forEach(s=>s.hidden=s.id!=='ob-4');$('#dirs-next').textContent='Сохранить';$('#dirs-next').removeAttribute('data-ob-next');$('#dirs-next').dataset.recoSave='';show('s-ob',{mode:'rise'});return}
+    if('reco' in d){closeOverlay(filters);obStep='4';obPrep('4');$$('.dir').forEach(b=>{b.classList.toggle('on',state.dirs.has(b.dataset.dir));b.setAttribute('aria-pressed',b.classList.contains('on'))});syncDirsNext();obProgress('4');$$('.ob-bg').forEach(b=>b.classList.toggle('hidden-bg',!b.classList.contains('dirs-bg')));$('#ob-head').hidden=false;$('[data-ob-prev]',$('#ob-head')).hidden=true;$$('.ob-step').forEach(s=>s.hidden=s.id!=='ob-4');$('#dirs-next').textContent='Сохранить';$('#dirs-next').removeAttribute('data-ob-next');$('#dirs-next').dataset.recoSave='';show('s-ob',{mode:'rise'});return}
     if('recoSave' in d){if(!$$('.dir.on').length){toast('Выберите хотя бы одно направление','','info');return}$('#dirs-next').textContent='Продолжить';delete $('#dirs-next').dataset.recoSave;$('#dirs-next').dataset.obNext='';state.homeLessonIdx=0;save();back();toast('Рекомендации обновлены',`Направлений: ${state.dirs.size}`);return}
     if('notifOpen' in d){hideNotif();state.notifAction&&state.notifAction();state.notifAction=null;return}
     if('resetDemo' in d){confirmDialog({title:'Сбросить демо?',text:'Записи, связи, билеты и созданные занятия удалятся. Онбординг покажется заново',ok:'Сбросить',onOk:()=>{try{localStorage.removeItem('looma')}catch(x){}location.reload()}});return}
@@ -2157,7 +2158,7 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
   function syncSide(){ $$('#side-role button').forEach(b=>b.classList.toggle('on',state.obDone&&b.dataset.r===state.role)) }
   function save(){ syncSide(); try{ localStorage.setItem('looma',JSON.stringify({v:DATA_VERSION,role:state.role,dirs:[...state.dirs],enrolled:[...state.enrolled],favEvents:[...state.favEvents],favLessons:[...state.favLessons],tickets:[...state.tickets],connections:state.connections,obDone:state.obDone,classes:CLASSES,nextId:state.nextId})) }catch(e){} }
   function load(){ try{ const j=JSON.parse(localStorage.getItem('looma')||'null'); if(!j)return false;
-    state.role=j.role||'dancer'; state.dirs=new Set(j.dirs||['Hip Hop','Frame Up']); state.obDone=!!j.obDone;
+    state.role=j.role||'dancer'; state.dirs=new Set(j.dirs||[]); state.obDone=!!j.obDone;
     if(j.v===DATA_VERSION){ state.enrolled=new Set(j.enrolled||['c1']); state.favEvents=new Set(j.favEvents||[]); state.favLessons=new Set(j.favLessons||[]); state.tickets=new Set(j.tickets||[]);
       state.connections=Object.fromEntries(Object.entries(j.connections||{}).filter(([,v])=>v==='connected')); if(Array.isArray(j.classes)&&j.classes.length)CLASSES=j.classes; state.nextId=j.nextId||100 }
     return true }catch(e){return false} }
@@ -2165,7 +2166,7 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
   /* ================= BOOT ================= */
   load(); renderTabbars(); syncSide(); try{history.replaceState({d:0},'')}catch(e){}
   $$('.rolecard').forEach(r=>r.classList.toggle('on',r.dataset.role===state.role));
-  $$('.dir').forEach(b=>{b.classList.toggle('on',state.dirs.has(b.dataset.dir));b.setAttribute('aria-pressed',b.classList.contains('on'))});
+  $$('.dir').forEach(b=>{b.classList.toggle('on',state.dirs.has(b.dataset.dir));b.setAttribute('aria-pressed',b.classList.contains('on'))}); syncDirsNext();
   syncFilterBadge();
   obProgress('2');
   if(state.obDone){ $('#s-ob').hidden=true; active='s-home'; const h=$('#s-home'); onShow['s-home'](); h.hidden=false; h.classList.add('in-rise'); setTimeout(()=>h.classList.remove('in-rise'),600); syncTabbars() }
