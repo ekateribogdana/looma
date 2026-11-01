@@ -436,10 +436,8 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
 .pcard .acts{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:var(--s-3)}
 .pcard .acts .btn{width:100%;height:36px;font-size:var(--fs-label)}
 /* Days */
-.days{display:grid;grid-template-columns:24px minmax(0,1fr) 24px;align-items:center;gap:8px;margin:0 0 16px}
-.days .arr{width:24px;height:24px;display:grid;place-items:center;color:var(--fg-1)}
-.days .arr svg{width:24px;height:24px}
-.days .daylist{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;min-width:0}
+.days{margin:0 0 16px}
+.days .daylist{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch}.days .daylist::-webkit-scrollbar{display:none}.days .day{flex:0 0 44px;scroll-snap-align:start}.day.none:not(.on){opacity:.4}
 .day{height:52px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;padding:0;transition:all var(--dur-base) var(--ease)}
 .day small{font-size:11px;font-weight:500;line-height:1.2;color:var(--fg-3)}.day b{font-size:15px;font-weight:500;line-height:1.2}.day.on small{color:var(--fg-1)}
 .day.on{background:var(--btn-primary);border-color:var(--accent-strong);animation:pop .35s var(--ease)}
@@ -780,7 +778,7 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
 /* QA: tap targets ≥ 44px без изменения визуала */
 .ttabs .chip{height:44px;margin:-6px 0}
 .sec .link,.psec .link{min-height:44px;margin:-12px 0;padding:0 2px}
-.days .arr{width:24px;height:44px;margin:-10px 0}
+
 .btn-xs{height:36px}
 .ob-login button{min-height:44px;padding:0 6px;margin:-12px 0}
 .reset-demo{min-height:44px}
@@ -1728,22 +1726,25 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
   }
 
   /* ================= CLASSES / EVENTS / STYLES ================= */
-  function renderDays(el,selected){
-    const base=addDays(TODAY_S,-4), off=Math.round((parse(selected)-parse(base))/864e5), start=addDays(base,Math.floor(off/5)*5);
-    let html=`<button class="arr" data-week="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 7l-5 5 5 5"/></svg></button><div class="daylist">`;
-    for(let i=0;i<5;i++){const d=addDays(start,i),dt=parse(d);html+=`<button class="day ${d===selected?'on':''} ${d===TODAY_S?'today':''}" data-day="${d}"><small>${DAYS_S[dt.getDay()]}</small><b>${dt.getDate()}</b></button>`}
-    html+=`</div><button class="arr" data-week="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 7l5 5-5 5"/></svg></button>`; el.innerHTML=html;
+  function renderDays(el,selected,has){
+    has=has||el._has; el._has=has;
+    const start=selected<TODAY_S?selected:TODAY_S, n=Math.max(14,Math.round((parse(selected)-parse(start))/864e5)+1), prev=el.querySelector('.daylist');
+    let html='<div class="daylist">';
+    for(let i=0;i<n;i++){const d=addDays(start,i),dt=parse(d);html+=`<button class="day ${d===selected?'on':''} ${d===TODAY_S?'today':''} ${has&&!has(d)?'none':''}" data-day="${d}"><small>${DAYS_S[dt.getDay()]}</small><b>${dt.getDate()}</b></button>`}
+    html+='</div>'; const x=prev?prev.scrollLeft:0; el.innerHTML=html;
+    const list=el.querySelector('.daylist'), on=list.querySelector('.on'); list.scrollLeft=x;
+    if(on&&(on.offsetLeft<list.scrollLeft||on.offsetLeft+on.offsetWidth>list.scrollLeft+list.clientWidth))list.scrollLeft=on.offsetLeft-list.clientWidth+on.offsetWidth+52;
   }
   onShow['s-classes']=renderClasses;
   function renderClasses(){
-    renderDays($('#days-classes'),state.classDay);
+    renderDays($('#days-classes'),state.classDay,d=>visibleClasses().some(c=>c.date===d));
     const rows=visibleClasses().filter(c=>c.date===state.classDay).sort(byTime);
     const next=visibleClasses().filter(c=>c.date>state.classDay).sort(byTime)[0];
     $('#classes-list').innerHTML=rows.length?rows.map((c,i)=>classCard(c,i)).join(''):`<div class="estate"><div class="ic" style="border-width:1.5px"><i style="width:8px;height:8px;border-radius:50%;background:var(--accent)"></i></div><h3>${state.classDay<TODAY_S?'Этот день уже прошёл':'В этот день занятий нет'}</h3><p style="margin-top:16px;max-width:295px">Выберите другой день или посмотрите ближайшие занятия по вашим стилям</p>${next?`<button class="btn btn-primary" data-day="${next.date}" style="margin-top:16px">Показать ближайшие</button>`:''}</div>`;
   }
   onShow['s-events']=renderEvents;
   function renderEvents(){
-    renderDays($('#days-events'),state.eventDay);
+    renderDays($('#days-events'),state.eventDay,d=>EVENTS.some(e=>(state.eventFilter==='all'||e.type===state.eventFilter)&&e.date===d));
     $$('#event-chips .chip').forEach(b=>b.classList.toggle('on',b.dataset.ef===state.eventFilter));
     const pass=e=>state.eventFilter==='all'||e.type===state.eventFilter;
     const rows=EVENTS.filter(e=>pass(e)&&e.date===state.eventDay), next=EVENTS.filter(e=>pass(e)&&e.date>state.eventDay).sort(byTime)[0];
@@ -1915,7 +1916,7 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
   onShow['s-lessons']=renderLessons; onShow['s-profile']=renderTeacherProfile;
   function renderLessons(){
     if(!state.lessonDay)state.lessonDay=TODAY_S;
-    renderDays($('#days-lessons'),state.lessonDay);
+    renderDays($('#days-lessons'),state.lessonDay,d=>myLessons().some(l=>l.status!=='cancelled'&&l.date===d));
     const list=$('#list'); list.innerHTML='';
     const live=myLessons().filter(l=>l.status!=='cancelled');
     const rows=live.filter(l=>l.date===state.lessonDay).sort(byTime);
@@ -2050,9 +2051,7 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
     if(d.event){state.currentEvent=d.event;flipShow(t.querySelector('img.bg')||t,'s-event','#ev-img');return}
     if(d.style){state.currentStyle=d.style;flipShow(t.querySelector('img')||t,'s-style','#sd-img');return}
     if(d.day&&active==='s-lessons'){state.lessonDay=d.day;renderLessons();return}
-    if(d.week&&active==='s-lessons'){state.lessonDay=addDays(state.lessonDay||TODAY_S,+d.week*5);renderLessons();return}
     if(d.day){ if(active==='s-classes'){state.classDay=d.day;renderDays($('#days-classes'),d.day);$('#classes-list').innerHTML='<div class="skel"><i class="bar"></i><div class="ln"><i style="width:96px;height:12px"></i><i style="width:180px;height:20px;margin-top:12px"></i><i style="width:112px;height:12px;margin-top:8px"></i><span class="tch"><i class="av"></i><i style="width:120px;height:12px"></i></span></div></div><div class="skel"><i class="bar"></i><div class="ln"><i style="width:96px;height:12px"></i><i style="width:180px;height:20px;margin-top:12px"></i><i style="width:112px;height:12px;margin-top:8px"></i><span class="tch"><i class="av"></i><i style="width:120px;height:12px"></i></span></div></div><div class="skel"><i class="bar"></i><div class="ln"><i style="width:96px;height:12px"></i><i style="width:180px;height:20px;margin-top:12px"></i><i style="width:112px;height:12px;margin-top:8px"></i><span class="tch"><i class="av"></i><i style="width:120px;height:12px"></i></span></div></div>';clearTimeout(state.skelT);state.skelT=setTimeout(renderClasses,450)} else {state.eventDay=d.day;renderEvents()} return}
-    if(d.week){ const n=+d.week*5; if(active==='s-classes'){state.classDay=addDays(state.classDay,n);renderClasses()} else {state.eventDay=addDays(state.eventDay,n);renderEvents()} return}
     if(d.ef){state.eventFilter=d.ef;renderEvents();return}
     if('favLesson' in d){const id=state.currentClass;const on=!state.favLessons.has(id);on?state.favLessons.add(id):state.favLessons.delete(id);t.classList.toggle('on',on);buzz();save();toast(on?'Добавлено в избранное':'Убрано из избранного',cls(id).title,'info');return}
     if('favEvent' in d){const id=state.currentEvent;const on=!state.favEvents.has(id);on?state.favEvents.add(id):state.favEvents.delete(id);t.classList.toggle('on',on);buzz();save();toast(on?'Добавлено в избранное':'Убрано из избранного',E[id].title,'info');return}
