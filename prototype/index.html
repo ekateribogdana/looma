@@ -254,9 +254,9 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
 .toast.leaving{animation:toastOut .3s var(--ease) both}
 @keyframes toastIn{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:none}}
 @keyframes toastOut{from{opacity:1}to{opacity:0;transform:translateY(12px)}}
-.toast .ic{width:38px;height:38px;border-radius:var(--r-full);background:var(--success);display:grid;place-items:center;flex:none}
-.toast .ic.info{background:var(--accent)}
-.toast .ic svg{width:20px;height:20px}
+.toast .ic{width:24px;height:24px;display:grid;place-items:center;flex:none;color:var(--success)}
+.toast .ic.info{color:var(--accent)}
+.toast .ic svg{width:24px;height:24px}
 .toast b{display:block;font-weight:500;font-size:var(--fs-body)}
 .toast small{display:block;color:var(--fg-2);font-size:var(--fs-body-s);margin-top:2px}
 .notif{position:absolute;left:12px;right:12px;top:calc(12px + var(--sat));z-index:40;display:flex;flex-direction:column;align-items:stretch;gap:4px;background:rgba(22,21,21,.72);backdrop-filter:blur(14px);border:0;border-radius:var(--r-m);padding:var(--s-4);box-shadow:0 14px 40px rgba(0,0,0,.6);animation:notifIn .5s var(--ease) both;text-align:left;width:auto}
@@ -1402,7 +1402,7 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
 </button>
 
 <div class="toast" id="toast" hidden>
-  <div class="ic" id="toast-ic"><svg viewBox="0 0 20 20" fill="none" stroke="#0f0f0f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5l4 4 8-9"/></svg></div>
+  <div class="ic" id="toast-ic"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5l4 4 8-9"/></svg></div>
   <div><b id="toast-t"></b><small id="toast-s"></small></div>
 </div>
 
