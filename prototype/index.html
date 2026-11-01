@@ -1,5 +1,5 @@
 <!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="stylesheet" href="/assets/transitions.css"><script src="/assets/transitions.js"></script>
-<style>[hidden]{display:none!important}</style><title>LOOMA</title>
+<style>[hidden]{display:none!important}</style><script>try{if(window.self!==window.top)document.documentElement.classList.add("framed")}catch(e){document.documentElement.classList.add("framed")}</script><title>LOOMA</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -62,6 +62,12 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 #app{position:relative;width:100%;height:100%;background:var(--bg-0);overflow:hidden}
 .statusbar,.homebar{display:none}
+/* встроен в слайд кейса (iframe): показываем статус-бар и полоску «домой», как в макетах Figma */
+html.framed #app{--sat:47px;--sab:22px}
+html.framed .statusbar{display:flex;position:absolute;left:0;right:0;top:0;height:47px;z-index:60;pointer-events:none;align-items:center;justify-content:space-between;padding:6px 30px 0 34px;font:600 16px/1 var(--font-body);color:#fff;letter-spacing:-.01em}
+html.framed .statusbar .ic{display:flex;align-items:center;gap:7px}
+html.framed .statusbar svg{height:12px;width:auto;display:block}
+html.framed .homebar{display:block;position:absolute;left:50%;bottom:8px;translate:-50% 0;width:134px;height:5px;border-radius:3px;background:rgba(255,255,255,.85);z-index:60;pointer-events:none;mix-blend-mode:difference}
 @media (min-width:520px) and (min-height:700px){
   #app{width:390px;height:min(844px,100% - 40px);border-radius:44px;box-shadow:0 40px 100px rgba(0,0,0,.7);--sat:47px;--sab:22px}
   .statusbar{display:flex;position:absolute;left:0;right:0;top:0;height:47px;z-index:60;pointer-events:none;align-items:center;justify-content:space-between;padding:6px 30px 0 34px;font:600 16px/1 var(--font-body);color:#fff;letter-spacing:-.01em}
@@ -976,7 +982,7 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
     <div class="cta"><button class="btn btn-primary" data-ob-next>Продолжить</button></div>
   </div>
   <div class="ob-step" id="ob-3" hidden>
-    <div class="ob-lower"><h2 class="ob-title">Нить рекомендаций<br>под вас</h2><p class="ob-sub">Подходящие уроки, события<br>и возможности для роста<br>в зависимости от вашей роли</p></div>
+    <div class="ob-lower"><h2 class="ob-title">Нить рекомендаций<br>под вас</h2><p class="ob-sub">Подходящие занятия, события<br>и возможности для роста<br>в зависимости от вашей роли</p></div>
     <div class="cta"><button class="btn btn-primary" data-ob-next>Далее</button></div>
   </div>
   <div class="ob-step" id="ob-v" hidden>
