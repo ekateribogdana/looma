@@ -613,6 +613,9 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
 .story-head{display:flex;align-items:center;gap:14px;margin-top:var(--s-5);pointer-events:auto}
 .story-head img{width:var(--avatar-xl);height:var(--avatar-xl);border:1px solid var(--accent)}
 .story-head b{display:block;font-weight:400}
+.story-who{all:unset;display:flex;align-items:center;gap:inherit;cursor:pointer;flex:1;min-width:0;-webkit-tap-highlight-color:transparent}
+.story-who:active{opacity:.7}
+.story-who:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:var(--r-s)}
 .story-head small{display:block;color:var(--fg-2);font-size:var(--fs-label);margin-top:var(--s-1)}
 .story-x{margin-left:auto;width:36px;height:36px;display:grid;place-items:center;color:var(--fg-2)}
 .story-x svg{width:18px;height:18px}
@@ -1241,7 +1244,7 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
   <div class="story-tap"><button data-story-prev aria-label="Назад"></button><button data-story-next aria-label="Дальше"></button></div>
   <div class="story-ui">
     <div class="story-prog" id="story-prog"><i></i><i></i><i></i></div>
-    <div class="story-head"><img class="avatar" id="story-av" src="img/img012-4d5e09e0.jpg" alt=""><div><b id="story-name"></b><small id="story-role"></small></div><button class="story-x" data-story-close aria-label="Закрыть"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3l10 10M13 3L3 13"/></svg></button></div>
+    <div class="story-head"><button class="story-who" data-story-profile aria-label="Открыть профиль"><img class="avatar" id="story-av" src="img/img012-4d5e09e0.jpg" alt=""><div><b id="story-name"></b><small id="story-role"></small></div></button><button class="story-x" data-story-close aria-label="Закрыть"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3l10 10M13 3L3 13"/></svg></button></div>
     <div class="story-txt" id="story-txt"><h2></h2><div class="sb"></div></div>
   </div>
 </section>
@@ -2144,6 +2147,7 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
     if('storyNext' in d){storyNext();return}
     if('storyPrev' in d){storyPrev();return}
     if('storyClose' in d){closeStory();return}
+    if('storyProfile' in d){const id=state.story.person;clearTimeout(state.story.timer);if(id)state.storySeen.add(id);state.currentPerson=id;if(id===meId()){stack=[];show(profileScreen(),{mode:'tab'});return}show('s-person',{mode:'replace'});return}
     // teacher
     if(d.open){openLesson(d.open);return}
     if('mark' in d){state.marking=!state.marking;renderRoster();return}
