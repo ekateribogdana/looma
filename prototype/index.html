@@ -69,6 +69,41 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
   .homebar{display:block;position:absolute;left:50%;bottom:8px;translate:-50% 0;width:134px;height:5px;border-radius:3px;background:rgba(255,255,255,.85);z-index:60;pointer-events:none;mix-blend-mode:difference}
 }
 
+.side{display:none}
+@media (min-width:1100px) and (min-height:700px){
+  .side{display:flex;flex-direction:column;justify-content:space-between;position:fixed;top:0;bottom:0;width:280px;padding:40px 0;color:var(--fg-2);font:400 14px/1.4 var(--font-body)}
+  .side-l{left:48px}
+  .side-r{right:48px;align-items:flex-end;text-align:right}
+  .side a{color:inherit;text-decoration:none}
+  .side .cap{font:500 11px/1.2 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--fg-3)}
+  .side .to-case{display:inline-flex;align-items:center;gap:8px;color:var(--fg-1);font-size:15px;transition:color var(--dur-base)}
+  .side .to-case:hover{color:var(--accent)}
+  .side .to-case svg{width:16px;height:16px}
+  .side .who{display:block;margin-top:12px}
+  .side .who:hover{color:var(--fg-1)}
+  .side h2{font:400 32px/1.1 var(--font-display);color:var(--fg-1);margin:12px 0 24px}
+  .side ol{list-style:none;margin:0;padding:0;display:grid;gap:16px;counter-reset:sc}
+  .side li{counter-increment:sc;display:grid;grid-template-columns:24px 1fr;gap:0 8px}
+  .side li::before{content:counter(sc);grid-row:span 2;font:500 12px/20px var(--font-body);color:var(--accent)}
+  .side li b{font-weight:500;color:var(--fg-1)}
+  .side li span{font-size:13px;line-height:1.4;color:var(--fg-3)}
+  .side .grp{display:grid;gap:12px;justify-items:end}
+  .side .seg{display:inline-flex;padding:4px;border:1px solid var(--border-2);border-radius:999px}
+  .side .seg button{height:36px;padding:0 16px;border-radius:999px;color:var(--fg-2);font-size:14px;transition:background var(--dur-base),color var(--dur-base)}
+  .side .seg button.on{background:rgba(107,15,12,.45);color:var(--fg-1);box-shadow:inset 0 0 0 1px rgba(254,93,87,.8)}
+  .side .reset{height:40px;padding:0 16px;border:1px solid var(--border-2);border-radius:999px;color:var(--fg-1);font-size:14px;transition:border-color var(--dur-base)}
+  .side .reset:hover,.side .seg button:not(.on):hover{border-color:var(--fg-3);color:var(--fg-1)}
+  .side .qr{display:grid;gap:12px;justify-items:end}
+  .side .qr-svg{width:112px;height:112px;padding:8px;background:#f4f0ec;color:#0f0f0f;border-radius:12px;box-sizing:content-box}
+}
+@media (min-width:520px) and (max-width:1099px) and (min-height:700px){
+  .side-l{display:block;position:fixed;left:24px;top:24px}
+  .side-l>:not(.nav){display:none}
+  .side .to-case{display:inline-flex;align-items:center;gap:8px;color:var(--fg-1);font-size:14px;text-decoration:none}
+  .side .to-case svg{width:16px;height:16px}
+  .side .who{display:none}
+}
+
 /* =====================================================================
    Typography utilities
    ===================================================================== */
@@ -241,7 +276,7 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
 .sheet .group{margin-bottom:var(--s-6)}
 .sheet .group h4{margin:0 0 var(--s-3);font:600 var(--fs-title-s)/var(--lh-snug) var(--font-body)}
 .sheet .btn+.btn{margin-top:8px}
-.modal-wrap{position:absolute;inset:0;background:rgba(15,15,15,.82);z-index:25;animation:tabIn var(--dur-base) var(--ease) both}
+.modal-wrap{position:absolute;inset:0;background:rgba(15,15,15,.82);z-index:40;animation:tabIn var(--dur-base) var(--ease) both}
 .modal-wrap[hidden]{display:none!important}
 .modal-wrap.closing{animation:fadeOut var(--dur-base) var(--ease-in) both;pointer-events:none}
 .modal{position:absolute;inset:auto 0;top:50%;transform:translateY(-50%);padding:0 var(--s-8);text-align:center;animation:pop var(--dur-slow) var(--ease) both}
@@ -882,6 +917,33 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
 .sres>.estate{margin-top:-8px}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}}
 </style></head><body>
+<aside class="side side-l" aria-label="О прототипе">
+  <div class="nav">
+    <a class="to-case" href="https://ekateribogdana.github.io/looma.html"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>Кейс Looma</a>
+    <a class="who cap" href="https://ekateribogdana.github.io/">Екатерина Богданова</a>
+  </div>
+  <div>
+    <div class="cap">Прототип</div>
+    <h2>Что попробовать</h2>
+    <ol>
+      <li><b>Онбординг танцора</b><span>Роль, вайб и стили — лента подстроится</span></li>
+      <li><b>Запись и отмена</b><span>Главная → занятие → «Записаться», потом «Мои записи»</span></li>
+      <li><b>Связь с человеком</b><span>Люди → «Создать связь» → «Ваша нить»</span></li>
+      <li><b>Первое занятие педагога</b><span>Роль «Педагог» → Кабинет → «Новое занятие»</span></li>
+      <li><b>Проведение занятия</b><span>Кабинет → занятие → «Отметить учеников»</span></li>
+    </ol>
+  </div>
+  <div class="cap">Looma · 2026</div>
+</aside>
+<aside class="side side-r" aria-label="Управление прототипом">
+  <div></div>
+  <div class="grp">
+    <div class="cap">Роль</div>
+    <div class="seg" id="side-role"><button data-r="dancer">Танцор</button><button data-r="teacher">Педагог</button></div>
+    <button class="reset" id="side-reset">Начать заново</button>
+  </div>
+  <div class="qr"><svg class="qr-svg" aria-hidden="true" viewBox="0 0 33 33" shape-rendering="crispEdges"><path fill="currentColor" d="M0 0h1v1h-1zM1 0h1v1h-1zM2 0h1v1h-1zM3 0h1v1h-1zM4 0h1v1h-1zM5 0h1v1h-1zM6 0h1v1h-1zM11 0h1v1h-1zM18 0h1v1h-1zM19 0h1v1h-1zM20 0h1v1h-1zM21 0h1v1h-1zM22 0h1v1h-1zM23 0h1v1h-1zM26 0h1v1h-1zM27 0h1v1h-1zM28 0h1v1h-1zM29 0h1v1h-1zM30 0h1v1h-1zM31 0h1v1h-1zM32 0h1v1h-1zM0 1h1v1h-1zM6 1h1v1h-1zM9 1h1v1h-1zM10 1h1v1h-1zM11 1h1v1h-1zM15 1h1v1h-1zM18 1h1v1h-1zM21 1h1v1h-1zM22 1h1v1h-1zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h1v1h-1zM3 2h1v1h-1zM4 2h1v1h-1zM6 2h1v1h-1zM8 2h1v1h-1zM9 2h1v1h-1zM10 2h1v1h-1zM14 2h1v1h-1zM19 2h1v1h-1zM20 2h1v1h-1zM21 2h1v1h-1zM26 2h1v1h-1zM28 2h1v1h-1zM29 2h1v1h-1zM30 2h1v1h-1zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h1v1h-1zM3 3h1v1h-1zM4 3h1v1h-1zM6 3h1v1h-1zM8 3h1v1h-1zM11 3h1v1h-1zM15 3h1v1h-1zM18 3h1v1h-1zM19 3h1v1h-1zM22 3h1v1h-1zM26 3h1v1h-1zM28 3h1v1h-1zM29 3h1v1h-1zM30 3h1v1h-1zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h1v1h-1zM3 4h1v1h-1zM4 4h1v1h-1zM6 4h1v1h-1zM8 4h1v1h-1zM9 4h1v1h-1zM10 4h1v1h-1zM13 4h1v1h-1zM14 4h1v1h-1zM15 4h1v1h-1zM16 4h1v1h-1zM20 4h1v1h-1zM21 4h1v1h-1zM22 4h1v1h-1zM23 4h1v1h-1zM26 4h1v1h-1zM28 4h1v1h-1zM29 4h1v1h-1zM30 4h1v1h-1zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM10 5h1v1h-1zM11 5h1v1h-1zM12 5h1v1h-1zM13 5h1v1h-1zM14 5h1v1h-1zM18 5h1v1h-1zM19 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h1v1h-1zM1 6h1v1h-1zM2 6h1v1h-1zM3 6h1v1h-1zM4 6h1v1h-1zM5 6h1v1h-1zM6 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h1v1h-1zM27 6h1v1h-1zM28 6h1v1h-1zM29 6h1v1h-1zM30 6h1v1h-1zM31 6h1v1h-1zM32 6h1v1h-1zM8 7h1v1h-1zM9 7h1v1h-1zM12 7h1v1h-1zM16 7h1v1h-1zM19 7h1v1h-1zM20 7h1v1h-1zM21 7h1v1h-1zM23 7h1v1h-1zM0 8h1v1h-1zM2 8h1v1h-1zM3 8h1v1h-1zM4 8h1v1h-1zM5 8h1v1h-1zM6 8h1v1h-1zM10 8h1v1h-1zM11 8h1v1h-1zM13 8h1v1h-1zM14 8h1v1h-1zM17 8h1v1h-1zM18 8h1v1h-1zM19 8h1v1h-1zM22 8h1v1h-1zM23 8h1v1h-1zM24 8h1v1h-1zM26 8h1v1h-1zM27 8h1v1h-1zM28 8h1v1h-1zM29 8h1v1h-1zM30 8h1v1h-1zM3 9h1v1h-1zM5 9h1v1h-1zM11 9h1v1h-1zM13 9h1v1h-1zM16 9h1v1h-1zM17 9h1v1h-1zM18 9h1v1h-1zM19 9h1v1h-1zM20 9h1v1h-1zM23 9h1v1h-1zM26 9h1v1h-1zM27 9h1v1h-1zM29 9h1v1h-1zM30 9h1v1h-1zM32 9h1v1h-1zM0 10h1v1h-1zM1 10h1v1h-1zM3 10h1v1h-1zM4 10h1v1h-1zM6 10h1v1h-1zM9 10h1v1h-1zM13 10h1v1h-1zM14 10h1v1h-1zM15 10h1v1h-1zM16 10h1v1h-1zM17 10h1v1h-1zM20 10h1v1h-1zM21 10h1v1h-1zM24 10h1v1h-1zM25 10h1v1h-1zM26 10h1v1h-1zM28 10h1v1h-1zM30 10h1v1h-1zM31 10h1v1h-1zM1 11h1v1h-1zM2 11h1v1h-1zM5 11h1v1h-1zM7 11h1v1h-1zM8 11h1v1h-1zM11 11h1v1h-1zM13 11h1v1h-1zM15 11h1v1h-1zM16 11h1v1h-1zM17 11h1v1h-1zM18 11h1v1h-1zM21 11h1v1h-1zM22 11h1v1h-1zM25 11h1v1h-1zM26 11h1v1h-1zM28 11h1v1h-1zM29 11h1v1h-1zM30 11h1v1h-1zM31 11h1v1h-1zM32 11h1v1h-1zM2 12h1v1h-1zM3 12h1v1h-1zM5 12h1v1h-1zM6 12h1v1h-1zM7 12h1v1h-1zM8 12h1v1h-1zM9 12h1v1h-1zM12 12h1v1h-1zM14 12h1v1h-1zM15 12h1v1h-1zM16 12h1v1h-1zM20 12h1v1h-1zM22 12h1v1h-1zM24 12h1v1h-1zM25 12h1v1h-1zM27 12h1v1h-1zM28 12h1v1h-1zM29 12h1v1h-1zM31 12h1v1h-1zM32 12h1v1h-1zM1 13h1v1h-1zM3 13h1v1h-1zM7 13h1v1h-1zM8 13h1v1h-1zM10 13h1v1h-1zM11 13h1v1h-1zM13 13h1v1h-1zM15 13h1v1h-1zM17 13h1v1h-1zM18 13h1v1h-1zM22 13h1v1h-1zM23 13h1v1h-1zM25 13h1v1h-1zM26 13h1v1h-1zM27 13h1v1h-1zM29 13h1v1h-1zM31 13h1v1h-1zM32 13h1v1h-1zM0 14h1v1h-1zM2 14h1v1h-1zM6 14h1v1h-1zM8 14h1v1h-1zM12 14h1v1h-1zM14 14h1v1h-1zM15 14h1v1h-1zM16 14h1v1h-1zM17 14h1v1h-1zM20 14h1v1h-1zM21 14h1v1h-1zM24 14h1v1h-1zM25 14h1v1h-1zM26 14h1v1h-1zM30 14h1v1h-1zM31 14h1v1h-1zM0 15h1v1h-1zM1 15h1v1h-1zM3 15h1v1h-1zM7 15h1v1h-1zM10 15h1v1h-1zM12 15h1v1h-1zM13 15h1v1h-1zM15 15h1v1h-1zM18 15h1v1h-1zM21 15h1v1h-1zM22 15h1v1h-1zM25 15h1v1h-1zM26 15h1v1h-1zM27 15h1v1h-1zM29 15h1v1h-1zM30 15h1v1h-1zM0 16h1v1h-1zM1 16h1v1h-1zM3 16h1v1h-1zM5 16h1v1h-1zM6 16h1v1h-1zM8 16h1v1h-1zM9 16h1v1h-1zM12 16h1v1h-1zM13 16h1v1h-1zM14 16h1v1h-1zM15 16h1v1h-1zM16 16h1v1h-1zM17 16h1v1h-1zM22 16h1v1h-1zM25 16h1v1h-1zM27 16h1v1h-1zM28 16h1v1h-1zM32 16h1v1h-1zM1 17h1v1h-1zM2 17h1v1h-1zM3 17h1v1h-1zM7 17h1v1h-1zM9 17h1v1h-1zM10 17h1v1h-1zM16 17h1v1h-1zM18 17h1v1h-1zM19 17h1v1h-1zM20 17h1v1h-1zM21 17h1v1h-1zM23 17h1v1h-1zM26 17h1v1h-1zM27 17h1v1h-1zM29 17h1v1h-1zM30 17h1v1h-1zM32 17h1v1h-1zM0 18h1v1h-1zM2 18h1v1h-1zM3 18h1v1h-1zM4 18h1v1h-1zM5 18h1v1h-1zM6 18h1v1h-1zM7 18h1v1h-1zM11 18h1v1h-1zM13 18h1v1h-1zM15 18h1v1h-1zM18 18h1v1h-1zM21 18h1v1h-1zM27 18h1v1h-1zM28 18h1v1h-1zM30 18h1v1h-1zM0 19h1v1h-1zM1 19h1v1h-1zM7 19h1v1h-1zM10 19h1v1h-1zM15 19h1v1h-1zM20 19h1v1h-1zM21 19h1v1h-1zM24 19h1v1h-1zM27 19h1v1h-1zM28 19h1v1h-1zM29 19h1v1h-1zM30 19h1v1h-1zM31 19h1v1h-1zM32 19h1v1h-1zM0 20h1v1h-1zM1 20h1v1h-1zM2 20h1v1h-1zM4 20h1v1h-1zM6 20h1v1h-1zM7 20h1v1h-1zM9 20h1v1h-1zM10 20h1v1h-1zM11 20h1v1h-1zM14 20h1v1h-1zM18 20h1v1h-1zM22 20h1v1h-1zM25 20h1v1h-1zM27 20h1v1h-1zM28 20h1v1h-1zM29 20h1v1h-1zM31 20h1v1h-1zM32 20h1v1h-1zM0 21h1v1h-1zM2 21h1v1h-1zM4 21h1v1h-1zM5 21h1v1h-1zM8 21h1v1h-1zM9 21h1v1h-1zM11 21h1v1h-1zM12 21h1v1h-1zM15 21h1v1h-1zM16 21h1v1h-1zM20 21h1v1h-1zM21 21h1v1h-1zM23 21h1v1h-1zM25 21h1v1h-1zM26 21h1v1h-1zM29 21h1v1h-1zM32 21h1v1h-1zM0 22h1v1h-1zM4 22h1v1h-1zM6 22h1v1h-1zM7 22h1v1h-1zM8 22h1v1h-1zM9 22h1v1h-1zM10 22h1v1h-1zM12 22h1v1h-1zM13 22h1v1h-1zM14 22h1v1h-1zM17 22h1v1h-1zM19 22h1v1h-1zM25 22h1v1h-1zM29 22h1v1h-1zM31 22h1v1h-1zM0 23h1v1h-1zM2 23h1v1h-1zM3 23h1v1h-1zM4 23h1v1h-1zM5 23h1v1h-1zM7 23h1v1h-1zM11 23h1v1h-1zM14 23h1v1h-1zM16 23h1v1h-1zM19 23h1v1h-1zM20 23h1v1h-1zM21 23h1v1h-1zM23 23h1v1h-1zM25 23h1v1h-1zM28 23h1v1h-1zM29 23h1v1h-1zM30 23h1v1h-1zM31 23h1v1h-1zM0 24h1v1h-1zM2 24h1v1h-1zM6 24h1v1h-1zM7 24h1v1h-1zM10 24h1v1h-1zM12 24h1v1h-1zM17 24h1v1h-1zM19 24h1v1h-1zM22 24h1v1h-1zM23 24h1v1h-1zM24 24h1v1h-1zM25 24h1v1h-1zM26 24h1v1h-1zM27 24h1v1h-1zM28 24h1v1h-1zM8 25h1v1h-1zM9 25h1v1h-1zM11 25h1v1h-1zM14 25h1v1h-1zM16 25h1v1h-1zM17 25h1v1h-1zM18 25h1v1h-1zM19 25h1v1h-1zM20 25h1v1h-1zM21 25h1v1h-1zM24 25h1v1h-1zM28 25h1v1h-1zM30 25h1v1h-1zM32 25h1v1h-1zM0 26h1v1h-1zM1 26h1v1h-1zM2 26h1v1h-1zM3 26h1v1h-1zM4 26h1v1h-1zM5 26h1v1h-1zM6 26h1v1h-1zM10 26h1v1h-1zM11 26h1v1h-1zM13 26h1v1h-1zM15 26h1v1h-1zM17 26h1v1h-1zM20 26h1v1h-1zM21 26h1v1h-1zM22 26h1v1h-1zM23 26h1v1h-1zM24 26h1v1h-1zM26 26h1v1h-1zM28 26h1v1h-1zM30 26h1v1h-1zM31 26h1v1h-1zM0 27h1v1h-1zM6 27h1v1h-1zM8 27h1v1h-1zM11 27h1v1h-1zM15 27h1v1h-1zM16 27h1v1h-1zM17 27h1v1h-1zM18 27h1v1h-1zM19 27h1v1h-1zM20 27h1v1h-1zM21 27h1v1h-1zM22 27h1v1h-1zM23 27h1v1h-1zM24 27h1v1h-1zM28 27h1v1h-1zM29 27h1v1h-1zM30 27h1v1h-1zM31 27h1v1h-1zM0 28h1v1h-1zM2 28h1v1h-1zM3 28h1v1h-1zM4 28h1v1h-1zM6 28h1v1h-1zM8 28h1v1h-1zM9 28h1v1h-1zM11 28h1v1h-1zM12 28h1v1h-1zM13 28h1v1h-1zM15 28h1v1h-1zM16 28h1v1h-1zM24 28h1v1h-1zM25 28h1v1h-1zM26 28h1v1h-1zM27 28h1v1h-1zM28 28h1v1h-1zM29 28h1v1h-1zM32 28h1v1h-1zM0 29h1v1h-1zM2 29h1v1h-1zM3 29h1v1h-1zM4 29h1v1h-1zM6 29h1v1h-1zM8 29h1v1h-1zM10 29h1v1h-1zM14 29h1v1h-1zM15 29h1v1h-1zM17 29h1v1h-1zM18 29h1v1h-1zM23 29h1v1h-1zM25 29h1v1h-1zM28 29h1v1h-1zM29 29h1v1h-1zM31 29h1v1h-1zM32 29h1v1h-1zM0 30h1v1h-1zM2 30h1v1h-1zM3 30h1v1h-1zM4 30h1v1h-1zM6 30h1v1h-1zM8 30h1v1h-1zM9 30h1v1h-1zM10 30h1v1h-1zM12 30h1v1h-1zM13 30h1v1h-1zM14 30h1v1h-1zM15 30h1v1h-1zM16 30h1v1h-1zM18 30h1v1h-1zM20 30h1v1h-1zM22 30h1v1h-1zM26 30h1v1h-1zM27 30h1v1h-1zM29 30h1v1h-1zM0 31h1v1h-1zM6 31h1v1h-1zM9 31h1v1h-1zM10 31h1v1h-1zM13 31h1v1h-1zM14 31h1v1h-1zM15 31h1v1h-1zM19 31h1v1h-1zM20 31h1v1h-1zM21 31h1v1h-1zM22 31h1v1h-1zM28 31h1v1h-1zM29 31h1v1h-1zM30 31h1v1h-1zM0 32h1v1h-1zM1 32h1v1h-1zM2 32h1v1h-1zM3 32h1v1h-1zM4 32h1v1h-1zM5 32h1v1h-1zM6 32h1v1h-1zM8 32h1v1h-1zM10 32h1v1h-1zM13 32h1v1h-1zM15 32h1v1h-1zM16 32h1v1h-1zM17 32h1v1h-1zM19 32h1v1h-1zM22 32h1v1h-1zM23 32h1v1h-1zM24 32h1v1h-1zM26 32h1v1h-1zM27 32h1v1h-1zM31 32h1v1h-1z"/></svg><div class="cap">Открыть на телефоне</div></div>
+</aside>
 
 <div id="app">
 <div class="statusbar"><span>9:41</span><span class="ic"><svg viewBox="0 0 18 12" fill="#fff"><rect x="0" y="8" width="3" height="4" rx=".8"/><rect x="5" y="6" width="3" height="6" rx=".8"/><rect x="10" y="3" width="3" height="9" rx=".8"/><rect x="15" y="0" width="3" height="12" rx=".8"/></svg><svg viewBox="0 0 16 12" fill="#fff"><path d="M8 3.2c2.2 0 4.2.9 5.7 2.3l1.3-1.3A9.9 9.9 0 008 1.2 9.9 9.9 0 001 4.2l1.3 1.3A8 8 0 018 3.2z"/><path d="M8 6.6c1.3 0 2.5.5 3.4 1.4l1.3-1.3A6.8 6.8 0 008 4.7a6.8 6.8 0 00-4.7 2l1.3 1.3A4.9 4.9 0 018 6.6z"/><path d="M8 10.1c.6 0 1.1.2 1.5.6L8 12l-1.5-1.3c.4-.4.9-.6 1.5-.6z"/></svg><svg viewBox="0 0 27 12" fill="none"><rect x=".5" y=".5" width="23" height="11" rx="3.5" stroke="#fff" stroke-opacity=".5"/><rect x="2" y="2" width="20" height="8" rx="2" fill="#fff"/><path d="M25 4v4a1.6 1.6 0 000-4z" fill="#fff" fill-opacity=".5"/></svg></span></div>
@@ -1999,6 +2061,11 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
   /* ================= CLICKS ================= */
   const sheet=$('#sheet'), filters=$('#filters'), search=$('#search'), buy=$('#buy'), confirmEl=$('#confirm');
   [sheet,filters,search,buy,confirmEl].forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeOverlay(o)}));
+  $('#side-role').addEventListener('click',e=>{const b=e.target.closest('[data-r]');if(!b||(state.obDone&&b.dataset.r===state.role))return;
+    overlays().forEach(o=>{if(!o.hidden)o.hidden=true});
+    state.role=b.dataset.r;state.obDone=true;state.currentPerson=meId();renderTabbars();save();stack=[];show('s-home',{mode:'tab'});
+    toast(state.role==='teacher'?'Теперь вы педагог':'Теперь вы танцор',state.role==='teacher'?'Ваши занятия — во вкладке «Кабинет»':'Ваши записи — во вкладке «Мои записи»','info')});
+  $('#side-reset').addEventListener('click',()=>confirmDialog({title:'Начать заново?',text:'Записи, связи, билеты и созданные занятия удалятся. Онбординг покажется заново',ok:'Начать заново',onOk:()=>{try{localStorage.removeItem('looma')}catch(x){}location.reload()}}));
   document.getElementById('app').addEventListener('click',e=>{
     if(suppressClick){e.stopPropagation();e.preventDefault();return}
     const t=e.target.closest('button,[data-fav-ev],[data-edit],[data-enroll-id],[data-person],[data-cancel-id]'); if(!t)return; const d=t.dataset;
@@ -2086,7 +2153,8 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){const o=overlays().find(o=>!o.hidden);if(o)closeOverlay(o);else if(active==='s-story')closeStory();else if(stack.length)back()}});
 
   /* ================= PERSISTENCE ================= */
-  function save(){ try{ localStorage.setItem('looma',JSON.stringify({v:DATA_VERSION,role:state.role,dirs:[...state.dirs],enrolled:[...state.enrolled],favEvents:[...state.favEvents],favLessons:[...state.favLessons],tickets:[...state.tickets],connections:state.connections,obDone:state.obDone,classes:CLASSES,nextId:state.nextId})) }catch(e){} }
+  function syncSide(){ $$('#side-role button').forEach(b=>b.classList.toggle('on',state.obDone&&b.dataset.r===state.role)) }
+  function save(){ syncSide(); try{ localStorage.setItem('looma',JSON.stringify({v:DATA_VERSION,role:state.role,dirs:[...state.dirs],enrolled:[...state.enrolled],favEvents:[...state.favEvents],favLessons:[...state.favLessons],tickets:[...state.tickets],connections:state.connections,obDone:state.obDone,classes:CLASSES,nextId:state.nextId})) }catch(e){} }
   function load(){ try{ const j=JSON.parse(localStorage.getItem('looma')||'null'); if(!j)return false;
     state.role=j.role||'dancer'; state.dirs=new Set(j.dirs||['Hip Hop','Frame Up']); state.obDone=!!j.obDone;
     if(j.v===DATA_VERSION){ state.enrolled=new Set(j.enrolled||['c1']); state.favEvents=new Set(j.favEvents||[]); state.favLessons=new Set(j.favLessons||[]); state.tickets=new Set(j.tickets||[]);
@@ -2094,7 +2162,7 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
     return true }catch(e){return false} }
 
   /* ================= BOOT ================= */
-  load(); renderTabbars(); try{history.replaceState({d:0},'')}catch(e){}
+  load(); renderTabbars(); syncSide(); try{history.replaceState({d:0},'')}catch(e){}
   $$('.rolecard').forEach(r=>r.classList.toggle('on',r.dataset.role===state.role));
   $$('.dir').forEach(b=>{b.classList.toggle('on',state.dirs.has(b.dataset.dir));b.setAttribute('aria-pressed',b.classList.contains('on'))});
   syncFilterBadge();
