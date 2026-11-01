@@ -1562,6 +1562,16 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
   function show(id,{mode='push',data}={}){
     if(busy&&mode!=='replace')return; if(id===active&&mode!=='replace')return;
     const from=$('#'+active), to=$('#'+id);
+    if(mode==='section'){ // section chips switch content in place, like tabs: header and chips stay put
+      onShow[id]&&onShow[id](data);
+      const fc=from.querySelector('[data-section-chips]'), tc=to.querySelector('[data-section-chips]'), x=fc?fc.scrollLeft:0;
+      $$('[data-rise]',to).forEach(n=>n.style.animation='none');
+      const fs=from.querySelector('.scroll'); if(fs)scrollMem[from.id]=fs.scrollTop;
+      from.hidden=true; to.hidden=false; const sc=to.querySelector('.scroll'); if(sc)sc.scrollTop=0;
+      if(tc){tc.scrollLeft=x; const on=tc.querySelector('.on'); if(on&&(on.offsetLeft<tc.scrollLeft||on.offsetLeft+on.offsetWidth>tc.scrollLeft+tc.clientWidth))tc.scrollTo({left:on.offsetLeft-20,behavior:reduce?'auto':'smooth'});
+        if(!reduce){let n=tc.nextElementSibling; while(n){n.animate([{opacity:0},{opacity:1}],{duration:180,easing:'ease-out'}); n=n.nextElementSibling}}}
+      active=id; syncTabbars(); syncFilterBadge(); return;
+    }
     if(mode==='push'||mode==='flip'||mode==='rise'){stack.push(active);pushHist()}
     if(mode==='tab'){stack=[]}
     onShow[id]&&onShow[id](data);
@@ -1579,7 +1589,7 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
   const overlayOpen=()=>overlays().some(o=>!o.hidden);
   window.addEventListener('popstate',()=>{ if(overlayOpen()){overlays().forEach(o=>{if(!o.hidden)closeOverlay(o)});pushHist();return} histDepth=Math.max(0,histDepth-1); if(stack.length)doBack(); });
   function tabTo(id){ if(id===active){const sc=$('#'+id+' .scroll');sc&&sc.scrollTo({top:0,behavior:'smooth'});return} show(id,{mode:'tab'}) }
-  function sectionTo(id){ if(id===active)return; if(id==='s-home'){show('s-home',{mode:'tab'});return} if(SECTION_IDS.includes(active)&&active!=='s-home'){show(id,{mode:'replace'})} else show(id) }
+  function sectionTo(id){ if(id===active)return; if(SECTION_IDS.includes(active)){show(id,{mode:'section'});return} if(id==='s-home'){show('s-home',{mode:'tab'});return} show(id) }
   function flipShow(src,id,targetSel){
     if(reduce||!src||!(src instanceof Element)){show(id);return}
     const a=src.getBoundingClientRect(); if(!a.width){show(id);return}
