@@ -4,13 +4,17 @@
 <meta charset="utf-8">
 <title>Екатерина Богданова — продуктовый дизайнер (UX/UI). Резюме</title>
 <meta name="author" content="Екатерина Богданова">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+@font-face{font-family:Inter;font-weight:400;src:url(fonts/inter-cyrillic-400.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:Inter;font-weight:400;src:url(fonts/inter-latin-400.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2190-2199,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:Inter;font-weight:500;src:url(fonts/inter-cyrillic-500.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:Inter;font-weight:500;src:url(fonts/inter-latin-500.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2190-2199,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:Inter;font-weight:600;src:url(fonts/inter-cyrillic-600.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:Inter;font-weight:600;src:url(fonts/inter-latin-600.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2190-2199,U+2212,U+2215,U+FEFF,U+FFFD}
 @page{size:A4;margin:14mm 14mm 12mm}
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--ink:#161616;--muted:#6b6b6b;--line:#dcdcdc;--accent:#d6403a}
-body{font-family:Inter,Arial,sans-serif;font-size:9.2pt;line-height:1.5;color:var(--ink);font-feature-settings:"liga" 0}
+body{font-family:Inter,Arial,sans-serif;font-size:9.2pt;line-height:1.5;color:var(--ink);font-feature-settings:"liga" 0,"kern" 0,"calt" 0;font-kerning:none;text-rendering:optimizeSpeed}
 a{color:inherit;text-decoration:none}
 b{font-weight:500}
 
@@ -73,7 +77,8 @@ main li::before{content:"–";display:inline-block;width:16px;text-indent:0;colo
   <div class="contacts">
     <div>Telegram <a href="https://t.me/ekateribog_dana">@ekateribog_dana</a></div>
     <div><a href="mailto:ekateribogdana@gmail.com">ekateribogdana@gmail.com</a></div>
-    <div><a class="lnk" href="https://ekateribogdana.github.io/">Портфолио</a> · <a class="lnk" href="https://www.behance.net/ekateribo">Behance</a></div>
+    <div><a class="lnk" href="https://ekateribogdana.github.io/">ekateribogdana.github.io</a></div>
+    <div><a class="lnk" href="https://www.behance.net/ekateribo">behance.net/ekateribo</a></div>
     <div class="city">Москва</div>
     <div class="city">Офис, гибрид или удалённо</div>
   </div>
@@ -86,7 +91,7 @@ main li::before{content:"–";display:inline-block;width:16px;text-indent:0;colo
 
   <h2>Опыт</h2>
   <div class="job">
-    <div class="head"><h3>Фриланс</h3><span class="date">февр. 2024 — н. в. <span class="now">• Сейчас</span></span></div>
+    <div class="head"><h3>Фриланс</h3> <span class="date">февр. 2024 — н. в. <span class="now">• Сейчас</span></span></div>
     <div class="sub">Продуктовый дизайнер (UX/UI) · сайты для студий, событий и бизнеса</div>
     <ul>
       <li>Vidmer.dance, <a class="lnk" href="https://vidmerdance.ru/">vidmerdance.ru</a>: расписание жило в переписке в Instagram и Telegram — собрала направления и расписание на сайте, запись ведёт сразу в Telegram студии</li>
@@ -101,7 +106,7 @@ main li::before{content:"–";display:inline-block;width:16px;text-indent:0;colo
 
   <h2>Проекты</h2>
   <div class="job">
-    <div class="head"><h3>Looma · приложение для танцоров</h3><span class="date">2026 · 2 месяца</span></div>
+    <div class="head"><h3>Looma · приложение для танцоров</h3> <span class="date">2026 · 2 месяца</span></div>
     <div class="sub"><span class="nw">Концепт-проект</span>, соло · <a class="lnk" href="https://ekateribogdana.github.io/looma.html">кейс</a> и <a class="lnk" href="https://ekateribogdana.github.io/looma/prototype/">прототип</a></div>
     <ul>
       <li>Провела интервью с 6 танцорами и 3 педагогами: занятия разбросаны по чатам и сторис, и непонятно, актуально ли расписание</li>
@@ -150,8 +155,8 @@ main li::before{content:"–";display:inline-block;width:16px;text-indent:0;colo
   <div class="edu"><b>Национальный институт бизнеса</b><span>Экономист, высшее · 2018</span></div>
 
   <h2>Языки</h2>
-  <div class="lang">Русский<span>Родной</span></div>
-  <div class="lang">Английский<span>A2</span></div>
+  <div class="lang">Русский <span>родной</span></div>
+  <div class="lang">Английский <span>A2</span></div>
 </aside>
 </div>
 
